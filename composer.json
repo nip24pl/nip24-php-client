@@ -1,0 +1,22 @@
+{
+	"name": "nip24/client",
+	"description": "NIP24 Client for PHP",
+	"type": "library",
+	"keywords": [ "nip24", "api", "vat", "nip", "regon", "krs", "iban", "ceidg", "gus", "eu", "vies", "validator" ],
+	"license": "Apache-2.0",
+	"homepage": "https://nip24.pl",
+	"authors": [
+        {
+            "name": "NETCAT",
+            "email": "firma@netcat.pl",
+            "homepage": "https://netcat.pl"
+        }
+    ],
+	"minimum-stability": "stable",
+    "autoload": {
+        "psr-4": { "NIP24\\": "NIP24/" }
+    },
+    "require": {
+		"php": ">=5.6"
+    }
+}
