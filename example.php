@@ -27,7 +27,7 @@
 			
 			$nip = '7171642051';
 			$nip_eu = 'PL' . $nip;
-			$iban = '92114020040000340203362212';
+			$account_number = '49154000046458439719826658';
 
 			// Sprawdzenie stanu konta
 			$account = $nip24->getAccountStatus();
@@ -55,7 +55,7 @@
 			}
 			
 			// Sprawdzenie statusu firmy w rejestrze VAT
-			$vat = $nip24->getVATStatusExt(\NIP24\Number::NIP, $nip, true);
+			$vat = $nip24->getVATStatusExt(\NIP24\Number::NIP, $nip);
 			
 			if ($vat) {
 			    echo '<p>NIP: ' . $vat->nip . '</p>';
@@ -71,7 +71,7 @@
 			}
 				
 			// Wywołanie metody zwracającej dane do faktury
-			$invoice = $nip24->getInvoiceDataExt(\NIP24\Number::NIP, $nip, false);
+			$invoice = $nip24->getInvoiceDataExt(\NIP24\Number::NIP, $nip);
 			
 			if ($invoice) {
 				echo '<p>Nazwa: ' . $invoice->name . '</p>';
@@ -85,7 +85,7 @@
 			}
 			
 			// Wywołanie metody zwracającej szczegółowe dane firmy
-			$all = $nip24->getAllDataExt(\NIP24\Number::NIP, $nip, false);
+			$all = $nip24->getAllDataExt(\NIP24\Number::NIP, $nip);
 			
 			if ($all) {
 				echo '<pre>' . print_r($all, true) . '</pre>';
@@ -105,7 +105,7 @@
 			}
 
 			// Wywołanie metody zwracającej informacje o rachunku bankowym
-			$iban = $nip24->getIBANStatusExt(\NIP24\Number::NIP, $nip, $iban);
+			$iban = $nip24->getIBANStatusExt(\NIP24\Number::NIP, $nip, $account_number);
 				
 			if ($iban) {
 			    echo '<pre>' . print_r($iban, true) . '</pre>';

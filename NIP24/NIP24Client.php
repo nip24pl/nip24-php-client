@@ -200,10 +200,10 @@ class NIP24Client
      * @param string $nip
      *            NIP number
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceData($nip, $force = false)
+    public function getInvoiceData($nip, $force = true)
     {
         return $this->getInvoiceDataExt(Number::NIP, $nip, $force);
     }
@@ -216,10 +216,10 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceDataExt($type, $number, $force = false)
+    public function getInvoiceDataExt($type, $number, $force = true)
     {
         // clear error
         $this->err = '';
@@ -229,8 +229,7 @@ class NIP24Client
             return false;
         }
         
-        $fun = ($force === true ? 'getf' : 'get');
-        $url = ($this->url . '/' . $fun . '/invoice/' . $suffix);
+        $url = ($this->url . '/get/invoice/' . $suffix);
         
         // send request
         $res = $this->get($url);
@@ -284,10 +283,10 @@ class NIP24Client
      * @param string $nip
      *            NIP number
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllData($nip, $force = false)
+    public function getAllData($nip, $force = true)
     {
         return $this->getAllDataExt(Number::NIP, $nip, $force);
     }
@@ -300,10 +299,10 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllDataExt($type, $number, $force = false)
+    public function getAllDataExt($type, $number, $force = true)
     {
         // clear error
         $this->err = '';
@@ -313,8 +312,7 @@ class NIP24Client
             return false;
         }
         
-        $fun = ($force === true ? 'getf' : 'get');
-        $url = ($this->url . '/' . $fun . '/all/' . $suffix);
+        $url = ($this->url . '/get/all/' . $suffix);
         
         // send request
         $res = $this->get($url);
@@ -500,10 +498,10 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param bool $direct
-     *            true - check nip directly at PPU MF portal, false - fetch additional data
+     *            ignored, left for backward compatibility
      * @return VATStatus|false
      */
-    public function getVATStatusExt($type, $number, $direct = false)
+    public function getVATStatusExt($type, $number, $direct = true)
     {
         // clear error
         $this->err = '';
@@ -513,8 +511,7 @@ class NIP24Client
             return false;
         }
     
-        $fun = ($direct === true ? 'direct' : 'indirect');
-        $url = ($this->url . '/check/vat/' . $fun . '/' . $suffix);
+        $url = ($this->url . '/check/vat/direct/' . $suffix);
     
         // send request
         $res = $this->get($url);
@@ -561,9 +558,9 @@ class NIP24Client
      * @param string $nip
      *            NIP number
      * @param string $iban
-     *            bank account IBAN
+     *            bank account IBAN (for polish numbers PL prefix may be omitted)
      * @param string $date
-     *            date in format 'yyyy-mm-dd'
+     *            date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
     public function getIBANStatus($nip, $iban, $date = null)
@@ -579,9 +576,9 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param string $iban
-     *            bank account IBAN
+     *            bank account IBAN (for polish numbers PL prefix may be omitted)
      * @param string $date
-     *            date in format 'yyyy-mm-dd'
+     *            date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
     public function getIBANStatusExt($type, $number, $iban, $date = null)
