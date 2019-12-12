@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.3.3';
+    const VERSION = '1.3.4';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -53,6 +53,7 @@ class NIP24Client
             'VIESData.php',
             'VATStatus.php',
 			'IBANStatus.php',
+            'WLStatus.php',
             'NIP.php',
             'EUVAT.php',
             'REGON.php',
@@ -200,10 +201,10 @@ class NIP24Client
      * @param string $nip
      *            NIP number
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceData($nip, $force = false)
+    public function getInvoiceData($nip, $force = true)
     {
         return $this->getInvoiceDataExt(Number::NIP, $nip, $force);
     }
@@ -216,10 +217,10 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceDataExt($type, $number, $force = false)
+    public function getInvoiceDataExt($type, $number, $force = true)
     {
         // clear error
         $this->err = '';
@@ -229,8 +230,7 @@ class NIP24Client
             return false;
         }
         
-        $fun = ($force === true ? 'getf' : 'get');
-        $url = ($this->url . '/' . $fun . '/invoice/' . $suffix);
+        $url = ($this->url . '/get/invoice/' . $suffix);
         
         // send request
         $res = $this->get($url);
@@ -284,10 +284,10 @@ class NIP24Client
      * @param string $nip
      *            NIP number
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllData($nip, $force = false)
+    public function getAllData($nip, $force = true)
     {
         return $this->getAllDataExt(Number::NIP, $nip, $force);
     }
@@ -300,10 +300,10 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param bool $force
-     *            false - get current data, true - force refresh
+     *            ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllDataExt($type, $number, $force = false)
+    public function getAllDataExt($type, $number, $force = true)
     {
         // clear error
         $this->err = '';
@@ -313,8 +313,7 @@ class NIP24Client
             return false;
         }
         
-        $fun = ($force === true ? 'getf' : 'get');
-        $url = ($this->url . '/' . $fun . '/all/' . $suffix);
+        $url = ($this->url . '/get/all/' . $suffix);
         
         // send request
         $res = $this->get($url);
@@ -500,10 +499,10 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param bool $direct
-     *            true - check nip directly at PPU MF portal, false - fetch additional data
+     *            ignored, left for backward compatibility
      * @return VATStatus|false
      */
-    public function getVATStatusExt($type, $number, $direct = false)
+    public function getVATStatusExt($type, $number, $direct = true)
     {
         // clear error
         $this->err = '';
@@ -513,8 +512,7 @@ class NIP24Client
             return false;
         }
     
-        $fun = ($direct === true ? 'direct' : 'indirect');
-        $url = ($this->url . '/check/vat/' . $fun . '/' . $suffix);
+        $url = ($this->url . '/check/vat/direct/' . $suffix);
     
         // send request
         $res = $this->get($url);
@@ -546,7 +544,7 @@ class NIP24Client
         $vs->regon = $this->xpath($doc, '/result/vat/regon/text()');
         $vs->name = $this->xpath($doc, '/result/vat/name/text()');
         
-        $vs->status = $this->xpath($doc, '/result/vat/status/text()');
+        $vs->status = intval($this->xpath($doc, '/result/vat/status/text()'));
         $vs->result = $this->xpath($doc, '/result/vat/result/text()');
         
         $vs->date = $this->xpathDate($doc, '/result/vat/date/text()');
@@ -561,9 +559,9 @@ class NIP24Client
      * @param string $nip
      *            NIP number
      * @param string $iban
-     *            bank account IBAN
+     *            bank account IBAN (for polish numbers PL prefix may be omitted)
      * @param string $date
-     *            date in format 'yyyy-mm-dd'
+     *            date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
     public function getIBANStatus($nip, $iban, $date = null)
@@ -579,9 +577,9 @@ class NIP24Client
      * @param string $number
      *            search number value
      * @param string $iban
-     *            bank account IBAN
+     *            bank account IBAN (for polish numbers PL prefix may be omitted)
      * @param string $date
-     *            date in format 'yyyy-mm-dd'
+     *            date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
     public function getIBANStatusExt($type, $number, $iban, $date = null)
@@ -649,7 +647,106 @@ class NIP24Client
         return $is;
     }
 
-	/**
+    /**
+     * Check bank account status and VAT status using whitelist file
+     *
+     * @param string $nip
+     *            NIP number
+     * @param string $iban
+     *            bank account IBAN (for polish numbers PL prefix may be omitted)
+     * @param string $date
+     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @return WLStatus|false
+     */
+    public function getWhitelistStatus($nip, $iban, $date = null)
+    {
+        return $this->getWhitelistStatusExt(Number::NIP, $nip, $iban, $date);
+    }
+
+    /**
+     * Check bank account status and VAT status using whitelist file
+     *
+     * @param int $type
+     *            search number type as Number::xxx value
+     * @param string $number
+     *            search number value
+     * @param string $iban
+     *            bank account IBAN (for polish numbers PL prefix may be omitted)
+     * @param string $date
+     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @return WLStatus|false
+     */
+    public function getWhitelistStatusExt($type, $number, $iban, $date = null)
+    {
+        // clear error
+        $this->err = '';
+
+        // validate number and construct path
+        if (! ($suffix = $this->getPathSuffix($type, $number))) {
+            return false;
+        }
+
+        if (! IBAN::isValid($iban)) {
+            $iban = ('PL' . $iban);
+
+            if (! IBAN::isValid($iban)) {
+                $this->err = 'Numer IBAN jest nieprawidłowy';
+                return false;
+            }
+        }
+
+        if (! $date) {
+            $date = date('Y-m-d');
+        }
+
+        $url = ($this->url . '/check/whitelist/' . $suffix . '/' . IBAN::normalize($iban) . '/'
+            . date('Y-m-d', strtotime($date)));
+
+        // send request
+        $res = $this->get($url);
+
+        if (! $res) {
+            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            return false;
+        }
+
+        // parse response
+        $doc = simplexml_load_string($res);
+
+        if (! $doc) {
+            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            return false;
+        }
+
+        $code = $this->xpath($doc, '/result/error/code/text()');
+
+        if (strlen($code) > 0) {
+            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            return false;
+        }
+
+        $wl = new WLStatus();
+
+        $wl->uid = $this->xpath($doc, '/result/whitelist/uid/text()');
+
+        $wl->nip = $this->xpath($doc, '/result/whitelist/nip/text()');
+        $wl->iban = $this->xpath($doc, '/result/whitelist/iban/text()');
+
+        $wl->valid = ($this->xpath($doc, '/result/whitelist/valid/text()') == 'true' ? true : false);
+        $wl->virtual = ($this->xpath($doc, '/result/whitelist/virtual/text()') == 'true' ? true : false);
+
+        $wl->vatStatus = intval($this->xpath($doc, '/result/whitelist/vatStatus/text()'));
+        $wl->vatResult = $this->xpath($doc, '/result/whitelist/vatResult/text()');
+
+        $wl->hashIndex = intval($this->xpath($doc, '/result/whitelist/hashIndex/text()'));
+        $wl->maskIndex = intval($this->xpath($doc, '/result/whitelist/maskIndex/text()'));
+        $wl->date = $this->xpathDate($doc, '/result/whitelist/date/text()');
+        $wl->source = $this->xpath($doc, '/result/whitelist/source/text()');
+
+        return $wl;
+    }
+
+    /**
      * Get current account status
      * 
      * @return AccountStatus|false
@@ -696,6 +793,7 @@ class NIP24Client
 		$as->item_price_invoice = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceInvoiceData/text()'));
 		$as->item_price_all = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceAllData/text()'));
 		$as->item_price_iban = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceIBANStatus/text()'));
+        $as->item_price_whitelist = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceWLStatus/text()'));
 		
 		$as->limit = intval($this->xpath($doc, '/result/account/billingPlan/limit/text()'));
 		$as->request_delay = intval($this->xpath($doc, '/result/account/billingPlan/requestDelay/text()'));
@@ -718,6 +816,7 @@ class NIP24Client
 		$as->func_get_vies_data =($this->xpath($doc, '/result/account/billingPlan/funcGetVIESData/text()') == 'true' ? true : false);
 		$as->func_get_vat_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetVATStatus/text()') == 'true' ? true : false);
 		$as->func_get_iban_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetIBANStatus/text()') == 'true' ? true : false);
+        $as->func_get_whitelist_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetWLStatus/text()') == 'true' ? true : false);
 		
 		$as->invoice_data_count = intval($this->xpath($doc, '/result/account/requests/invoiceData/text()'));
 		$as->all_data_count = intval($this->xpath($doc, '/result/account/requests/allData/text()'));
@@ -725,6 +824,7 @@ class NIP24Client
 		$as->vat_status_count = intval($this->xpath($doc, '/result/account/requests/vatStatus/text()'));
 		$as->vies_status_count = intval($this->xpath($doc, '/result/account/requests/viesStatus/text()'));
 		$as->iban_status_count = intval($this->xpath($doc, '/result/account/requests/ibanStatus/text()'));
+        $as->whitelist_status_count = intval($this->xpath($doc, '/result/account/requests/wlStatus/text()'));
 		$as->total_count = intval($this->xpath($doc, '/result/account/requests/total/text()'));
         
         return $as;
@@ -793,7 +893,7 @@ class NIP24Client
     /**
      * Set some common CURL options
      * 
-     * @param cURL $curl            
+     * @param resource $curl
      */
     private function setCurlOpt($curl)
     {
@@ -813,7 +913,7 @@ class NIP24Client
      * 
      * @param string $url
      *            target URL
-     * @return result|false
+     * @return string|false
      */
     private function get($url)
     {
@@ -856,7 +956,7 @@ class NIP24Client
     /**
      * Get element content as text
      * 
-     * @param SimpleXMLElement $doc
+     * @param \SimpleXMLElement $doc
      *            XML document
      * @param string $path
      *            xpath string
@@ -880,7 +980,7 @@ class NIP24Client
     /**
      * Get element content as date in format yyyy-mm-dd
      * 
-     * @param SimpleXMLElement $doc
+     * @param \SimpleXMLElement $doc
      *            XML document
      * @param string $path
      *            xpath string
@@ -908,8 +1008,6 @@ class NIP24Client
      */
     private function getPathSuffix($type, $number)
     {
-        $path = '';
-        
         if ($type == Number::NIP) {
             if (! NIP::isValid($number)) {
                 $this->err = 'Numer NIP jest nieprawidłowy';

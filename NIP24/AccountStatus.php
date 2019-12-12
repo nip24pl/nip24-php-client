@@ -42,6 +42,8 @@ class AccountStatus
 	
 	public $item_price_iban;
 
+    public $item_price_whitelist;
+
     public $limit;
 
     public $request_delay;
@@ -78,6 +80,8 @@ class AccountStatus
 	
 	public $func_get_iban_status;
 
+    public $func_get_whitelist_status;
+
     public $invoice_data_count;
 
     public $all_data_count;
@@ -89,6 +93,8 @@ class AccountStatus
     public $vies_status_count;
 	
 	public $iban_status_count;
+
+	public $whitelist_status_count;
 
     public $total_count;
 }
