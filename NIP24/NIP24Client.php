@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2019 NETCAT (www.netcat.pl)
+ * Copyright 2015-2020 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  * 
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2019 NETCAT (www.netcat.pl)
+ * @copyright 2015-2020 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.3.4';
+    const VERSION = '1.3.5';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -38,6 +38,8 @@ class NIP24Client
     private $id;
     private $key;
     private $app;
+
+    private $errcode;
     private $err;
 
     /**
@@ -46,6 +48,7 @@ class NIP24Client
     public static function autoload($className)
     {
         $files = array(
+			'Error.php',
             'PKD.php',
 			'AccountStatus.php',
             'InvoiceData.php',
@@ -54,6 +57,9 @@ class NIP24Client
             'VATStatus.php',
 			'IBANStatus.php',
             'WLStatus.php',
+            'SearchResult.php',
+            'VATEntity.php',
+            'VATPerson.php',
             'NIP.php',
             'EUVAT.php',
             'REGON.php',
@@ -100,7 +106,7 @@ class NIP24Client
         }
         
         $this->app = '';
-        $this->err = '';
+        $this->clear();
         
         date_default_timezone_set('Europe/Warsaw');
     }
@@ -151,7 +157,7 @@ class NIP24Client
     public function isActiveExt($type, $number)
     {
         // clear error
-        $this->err = '';
+        $this->clear();
         
         // validate number and construct path
         if (! ($suffix = $this->getPathSuffix($type, $number))) {
@@ -165,7 +171,7 @@ class NIP24Client
         $res = $this->get($url);
         
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
         
@@ -173,7 +179,7 @@ class NIP24Client
         $doc = simplexml_load_string($res);
         
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
         
@@ -182,11 +188,11 @@ class NIP24Client
         if (strlen($code) > 0) {
             if ($code == 9) {
                 // not active
-                $this->err = '';
+                $this->clear();
                 return false;
             }
             else {
-                $this->err = $this->xpath($doc, '/result/error/description/text()');
+                $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
                 return false;
             }
         }
@@ -223,7 +229,7 @@ class NIP24Client
     public function getInvoiceDataExt($type, $number, $force = true)
     {
         // clear error
-        $this->err = '';
+        $this->clear();
         
         // validate number and construct path
         if (! ($suffix = $this->getPathSuffix($type, $number))) {
@@ -236,7 +242,7 @@ class NIP24Client
         $res = $this->get($url);
         
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
         
@@ -244,14 +250,14 @@ class NIP24Client
         $doc = simplexml_load_string($res);
         
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
         
         $code = $this->xpath($doc, '/result/error/code/text()');
         
         if (strlen($code) > 0) {
-            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
             return false;
         }
         
@@ -306,7 +312,7 @@ class NIP24Client
     public function getAllDataExt($type, $number, $force = true)
     {
         // clear error
-        $this->err = '';
+        $this->clear();
         
         // validate number and construct path
         if (! ($suffix = $this->getPathSuffix($type, $number))) {
@@ -319,7 +325,7 @@ class NIP24Client
         $res = $this->get($url);
         
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
         
@@ -327,14 +333,14 @@ class NIP24Client
         $doc = simplexml_load_string($res);
         
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
         
         $code = $this->xpath($doc, '/result/error/code/text()');
         
         if (strlen($code) > 0) {
-            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
             return false;
         }
         
@@ -370,13 +376,13 @@ class NIP24Client
         $data->email = $this->xpath($doc, '/result/firm/email/text()');
         $data->www = $this->xpath($doc, '/result/firm/www/text()');
         
-        $data->creationDate = $this->xpathDate($doc, '/result/firm/creationDate/text()');
-        $data->startDate = $this->xpathDate($doc, '/result/firm/startDate/text()');
-        $data->registrationDate = $this->xpathDate($doc, '/result/firm/registrationDate/text()');
-        $data->holdDate = $this->xpathDate($doc, '/result/firm/holdDate/text()');
-        $data->renevalDate = $this->xpathDate($doc, '/result/firm/renevalDate/text()');
-        $data->lastUpdateDate = $this->xpathDate($doc, '/result/firm/lastUpdateDate/text()');
-        $data->endDate = $this->xpathDate($doc, '/result/firm/endDate/text()');
+        $data->creationDate = $this->xpathDateTime($doc, '/result/firm/creationDate/text()');
+        $data->startDate = $this->xpathDateTime($doc, '/result/firm/startDate/text()');
+        $data->registrationDate = $this->xpathDateTime($doc, '/result/firm/registrationDate/text()');
+        $data->holdDate = $this->xpathDateTime($doc, '/result/firm/holdDate/text()');
+        $data->renevalDate = $this->xpathDateTime($doc, '/result/firm/renevalDate/text()');
+        $data->lastUpdateDate = $this->xpathDateTime($doc, '/result/firm/lastUpdateDate/text()');
+        $data->endDate = $this->xpathDateTime($doc, '/result/firm/endDate/text()');
         
         $data->registryEntityCode = $this->xpath($doc, '/result/firm/registryEntity/code/text()');
         $data->registryEntityName = $this->xpath($doc, '/result/firm/registryEntity/name/text()');
@@ -384,7 +390,7 @@ class NIP24Client
         $data->registryCode = $this->xpath($doc, '/result/firm/registry/code/text()');
         $data->registryName = $this->xpath($doc, '/result/firm/registry/name/text()');
         
-        $data->recordCreationDate = $this->xpathDate($doc, '/result/firm/record/created/text()');
+        $data->recordCreationDate = $this->xpathDateTime($doc, '/result/firm/record/created/text()');
         $data->recordNumber = $this->xpath($doc, '/result/firm/record/number/text()');
         
         $data->basicLegalFormCode = $this->xpath($doc, '/result/firm/basicLegalForm/code/text()');
@@ -428,7 +434,7 @@ class NIP24Client
     public function getVIESData($euvat)
     {
         // clear error
-        $this->err = '';
+        $this->clear();
     
         // validate number and construct path
         if (! ($suffix = $this->getPathSuffix(Number::EUVAT, $euvat))) {
@@ -441,7 +447,7 @@ class NIP24Client
         $res = $this->get($url);
     
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
     
@@ -449,14 +455,14 @@ class NIP24Client
         $doc = simplexml_load_string($res);
     
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
     
         $code = $this->xpath($doc, '/result/error/code/text()');
     
         if (strlen($code) > 0) {
-            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
             return false;
         }
     
@@ -505,7 +511,7 @@ class NIP24Client
     public function getVATStatusExt($type, $number, $direct = true)
     {
         // clear error
-        $this->err = '';
+        $this->clear();
     
         // validate number and construct path
         if (! ($suffix = $this->getPathSuffix($type, $number))) {
@@ -518,7 +524,7 @@ class NIP24Client
         $res = $this->get($url);
     
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
     
@@ -526,14 +532,14 @@ class NIP24Client
         $doc = simplexml_load_string($res);
     
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
     
         $code = $this->xpath($doc, '/result/error/code/text()');
     
         if (strlen($code) > 0) {
-            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
             return false;
         }
     
@@ -585,7 +591,7 @@ class NIP24Client
     public function getIBANStatusExt($type, $number, $iban, $date = null)
     {
         // clear error
-        $this->err = '';
+        $this->clear();
     
         // validate number and construct path
 		if (! ($suffix = $this->getPathSuffix($type, $number))) {
@@ -596,7 +602,7 @@ class NIP24Client
 			$iban = ('PL' . $iban);
 			
 			if (! IBAN::isValid($iban)) {
-				$this->err = 'Numer IBAN jest nieprawidłowy';
+				$this->set(Error::CLI_IBAN);
 				return false;
 			}
 		}
@@ -612,7 +618,7 @@ class NIP24Client
         $res = $this->get($url);
     
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
     
@@ -620,14 +626,14 @@ class NIP24Client
         $doc = simplexml_load_string($res);
     
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
     
         $code = $this->xpath($doc, '/result/error/code/text()');
     
         if (strlen($code) > 0) {
-            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
             return false;
         }
     
@@ -679,7 +685,7 @@ class NIP24Client
     public function getWhitelistStatusExt($type, $number, $iban, $date = null)
     {
         // clear error
-        $this->err = '';
+        $this->clear();
 
         // validate number and construct path
         if (! ($suffix = $this->getPathSuffix($type, $number))) {
@@ -690,7 +696,7 @@ class NIP24Client
             $iban = ('PL' . $iban);
 
             if (! IBAN::isValid($iban)) {
-                $this->err = 'Numer IBAN jest nieprawidłowy';
+                $this->set(Error::CLI_IBAN);
                 return false;
             }
         }
@@ -706,7 +712,7 @@ class NIP24Client
         $res = $this->get($url);
 
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
 
@@ -714,14 +720,14 @@ class NIP24Client
         $doc = simplexml_load_string($res);
 
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
 
         $code = $this->xpath($doc, '/result/error/code/text()');
 
         if (strlen($code) > 0) {
-            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
             return false;
         }
 
@@ -747,6 +753,125 @@ class NIP24Client
     }
 
     /**
+     * Search data in VAT registry
+     *
+     * @param string $nip
+     *            NIP number
+     * @param string $date
+     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @return SearchResult|false
+     */
+    public function searchVATRegistry($nip, $date = null)
+    {
+        return $this->searchVATRegistryExt(Number::NIP, $nip, $date);
+    }
+
+    /**
+     * Search data in VAT registry
+     *
+     * @param int $type
+     *            search number type as Number::xxx value
+     * @param string $number
+     *            search number value
+     * @param string $date
+     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @return SearchResult|false
+     */
+    public function searchVATRegistryExt($type, $number, $date = null)
+    {
+        // clear error
+        $this->clear();
+
+        // validate number and construct path
+        if (! ($suffix = $this->getPathSuffix($type, $number))) {
+            return false;
+        }
+
+        if (! $date) {
+            $date = date('Y-m-d');
+        }
+
+        $url = ($this->url . '/search/vat/' . $suffix . '/' . date('Y-m-d', strtotime($date)));
+
+        // send request
+        $res = $this->get($url);
+
+        if (! $res) {
+            $this->set(Error::CLI_CONNECT);
+            return false;
+        }
+
+        // parse response
+        $doc = simplexml_load_string($res);
+
+        if (! $doc) {
+            $this->set(Error::CLI_RESPONSE);
+            return false;
+        }
+
+        $code = $this->xpath($doc, '/result/error/code/text()');
+
+        if (strlen($code) > 0) {
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
+            return false;
+        }
+
+        $sr = new SearchResult();
+
+        $sr->uid = $this->xpath($doc, '/result/search/uid/text()');
+
+        for ($i = 1; ; $i++) {
+            $nip = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/nip/text()');
+
+            if (! $nip) {
+                break;
+            }
+
+            $ve = new VATEntity();
+
+            $ve->name = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/name/text()');
+            $ve->nip = $nip;
+            $ve->regon = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/regon/text()');
+            $ve->krs = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/krs/text()');
+            $ve->residenceAddress = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/residenceAddress/text()');
+            $ve->workingAddress = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/workingAddress/text()');
+            $ve->vatStatus = intval($this->xpath($doc, '/result/search/entities/entity[' . $i . ']/vat/status/text()'));
+            $ve->vatResult = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/vat/result/text()');
+
+            $this->xpathVATPerson($doc, '/result/search/entities/entity[' . $i . ']/representatives', $ve->representatives);
+            $this->xpathVATPerson($doc, '/result/search/entities/entity[' . $i . ']/authorizedClerks', $ve->authorizedClerks);
+            $this->xpathVATPerson($doc, '/result/search/entities/entity[' . $i . ']/partners', $ve->partners);
+
+            for ($k = 1; ; $k++) {
+                $iban = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/ibans/iban[' . $k . ']/text()');
+
+                if (! $iban) {
+                    break;
+                }
+
+                array_push($ve->ibans, $iban);
+            }
+
+            $ve->hasVirtualAccounts = ($this->xpath($doc, '/result/search/entities/entity[' . $i . ']/hasVirtualAccounts/text()') == 'true' ? true : false);
+            $ve->registrationLegalDate = $this->xpathDate($doc, '/result/search/entities/entity[' . $i . ']/registrationLegalDate/text()');
+            $ve->registrationDenialDate = $this->xpathDate($doc, '/result/search/entities/entity[' . $i . ']/registrationDenialDate/text()');
+            $ve->registrationDenialBasis = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/registrationDenialBasis/text()');
+            $ve->restorationDate = $this->xpathDate($doc, '/result/search/entities/entity[' . $i . ']/restorationDate/text()');
+            $ve->restorationBasis = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/restorationBasis/text()');
+            $ve->removalDate = $this->xpathDate($doc, '/result/search/entities/entity[' . $i . ']/removalDate/text()');
+            $ve->removalBasis = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/removalBasis/text()');
+
+            array_push($sr->results, $ve);
+        }
+
+        $sr->id = $this->xpath($doc, '/result/search/id/text()');
+        $sr->date = $this->xpathDate($doc, '/result/search/date/text()');
+        $sr->source = $this->xpath($doc, '/result/search/source/text()');
+
+        return $sr;
+    }
+
+    /**
      * Get current account status
      * 
      * @return AccountStatus|false
@@ -754,7 +879,7 @@ class NIP24Client
     public function getAccountStatus()
     {
         // clear error
-        $this->err = '';
+        $this->clear();
     
         // construct path
         $url = ($this->url . '/check/account/status');
@@ -763,7 +888,7 @@ class NIP24Client
         $res = $this->get($url);
     
         if (! $res) {
-            $this->err = 'Nie udało się nawiązać połączenia z serwisem NIP24';
+            $this->set(Error::CLI_CONNECT);
             return false;
         }
     
@@ -771,20 +896,22 @@ class NIP24Client
         $doc = simplexml_load_string($res);
     
         if (! $doc) {
-            $this->err = 'Odpowiedź serwisu NIP24 ma nieprawidłowy format';
+            $this->set(Error::CLI_RESPONSE);
             return false;
         }
     
         $code = $this->xpath($doc, '/result/error/code/text()');
     
         if (strlen($code) > 0) {
-            $this->err = $this->xpath($doc, '/result/error/description/text()');
+            $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
             return false;
         }
     
         $as = new AccountStatus();
     
         $as->uid = $this->xpath($doc, '/result/account/uid/text()');
+        $as->type = $this->xpath($doc, '/result/account/type/text()');
+        $as->valid_to = $this->xpathDateTime($doc, '/result/account/validTo/text()');
 		$as->billing_plan_name = $this->xpath($doc, '/result/account/billingPlan/name/text()');
 		
 		$as->subscription_price = floatval($this->xpath($doc, '/result/account/billingPlan/subscriptionPrice/text()'));
@@ -794,6 +921,7 @@ class NIP24Client
 		$as->item_price_all = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceAllData/text()'));
 		$as->item_price_iban = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceIBANStatus/text()'));
         $as->item_price_whitelist = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceWLStatus/text()'));
+        $as->item_price_search_vat = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceSearchVAT/text()'));
 		
 		$as->limit = intval($this->xpath($doc, '/result/account/billingPlan/limit/text()'));
 		$as->request_delay = intval($this->xpath($doc, '/result/account/billingPlan/requestDelay/text()'));
@@ -817,6 +945,7 @@ class NIP24Client
 		$as->func_get_vat_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetVATStatus/text()') == 'true' ? true : false);
 		$as->func_get_iban_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetIBANStatus/text()') == 'true' ? true : false);
         $as->func_get_whitelist_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetWLStatus/text()') == 'true' ? true : false);
+        $as->func_search_vat = ($this->xpath($doc, '/result/account/billingPlan/funcSearchVAT/text()') == 'true' ? true : false);
 		
 		$as->invoice_data_count = intval($this->xpath($doc, '/result/account/requests/invoiceData/text()'));
 		$as->all_data_count = intval($this->xpath($doc, '/result/account/requests/allData/text()'));
@@ -825,19 +954,51 @@ class NIP24Client
 		$as->vies_status_count = intval($this->xpath($doc, '/result/account/requests/viesStatus/text()'));
 		$as->iban_status_count = intval($this->xpath($doc, '/result/account/requests/ibanStatus/text()'));
         $as->whitelist_status_count = intval($this->xpath($doc, '/result/account/requests/wlStatus/text()'));
+        $as->search_vat_count = intval($this->xpath($doc, '/result/account/requests/searchVAT/text()'));
 		$as->total_count = intval($this->xpath($doc, '/result/account/requests/total/text()'));
         
         return $as;
     }
 
 	/**
-     * Get last error message
+     * Get last error code
      * 
+     * @return int error code
+     */
+    public function getLastErrorCode()
+    {
+        return $this->errcode;
+    }
+
+    /**
+     * Get last error message
+     *
      * @return string error message
      */
     public function getLastError()
     {
         return $this->err;
+    }
+
+    /**
+     * Clear error
+     */
+    private function clear()
+    {
+        $this->errcode = 0;
+        $this->err = '';
+    }
+
+    /**
+     * Set error details
+     *
+     * @param int $code error code
+     * @param string $err error message
+     */
+    private function set($code, $err = null)
+    {
+        $this->errcode = $code;
+        $this->err = (empty($err) ? Error::message($code) : $err);
     }
 
     /**
@@ -996,7 +1157,54 @@ class NIP24Client
         
         return date('Y-m-d', strtotime($val));
     }
-    
+
+    /**
+     * Get element content as date and time in format yyyy-mm-dd hh:mm:ss
+     *
+     * @param \SimpleXMLElement $doc
+     *            XML document
+     * @param string $path
+     *            xpath string
+     * @return string output date time
+     */
+    private function xpathDateTime($doc, $path)
+    {
+        $val = $this->xpath($doc, $path);
+
+        if (empty($val)) {
+            return '';
+        }
+
+        return date('Y-m-d H:i:s', strtotime($val));
+    }
+
+    /**
+     * Get element content as VAT person object
+     *
+     * @param \SimpleXMLElement $doc XML document
+     * @param string $path xpath string
+     * @param array $a VAT persons array reference
+     */
+    private function xpathVATPerson($doc, $path, &$a)
+    {
+        for ($i = 1; ; $i++) {
+            $nip = $this->xpath($doc, $path . '/person[' . $i . ']/nip/text()');
+
+            if (! $nip) {
+                break;
+            }
+
+            $vp = new VATPerson();
+
+            $vp->nip = NIP::normalize($nip);
+            $vp->companyName = $this->xpath($doc, $path . '/person[' . $i . ']/companyName/text()');
+            $vp->firstName = $this->xpath($doc, $path . '/person[' . $i . ']/firstName/text()');
+            $vp->lastName = $this->xpath($doc, $path . '/person[' . $i . ']/lastName/text()');
+
+            array_push($a, $vp);
+        }
+    }
+
     /**
      * Get path suffix
      *
@@ -1010,34 +1218,45 @@ class NIP24Client
     {
         if ($type == Number::NIP) {
             if (! NIP::isValid($number)) {
-                $this->err = 'Numer NIP jest nieprawidłowy';
+                $this->set(Error::CLI_NIP);
                 return false;
             }
         
             $path = 'nip/' . NIP::normalize($number);
         } else if ($type == Number::REGON) {
             if (! REGON::isValid($number)) {
-                $this->err = 'Numer REGON jest nieprawidłowy';
+                $this->set(Error::CLI_REGON);
                 return false;
             }
         
             $path = 'regon/' . REGON::normalize($number);
         } else if ($type == Number::KRS) {
             if (! KRS::isValid($number)) {
-                $this->err = 'Numer KRS jest nieprawidłowy';
+                $this->set(Error::CLI_KRS);
                 return false;
             }
         
             $path = 'krs/' . KRS::normalize($number);
         } else if ($type == Number::EUVAT) {
             if (! EUVAT::isValid($number)) {
-                $this->err = 'Numer EU VAT ID jest nieprawidłowy';
+                $this->set(Error::CLI_EUVAT);
                 return false;
             }
         
             $path = 'euvat/' . EUVAT::normalize($number);
+        } else if ($type == Number::IBAN) {
+            if (! IBAN::isValid($number)) {
+                $number = 'PL' . $number;
+
+                if (! IBAN::isValid($number)) {
+                    $this->set(Error::CLI_IBAN);
+                    return false;
+                }
+            }
+
+            $path = 'iban/' . IBAN::normalize($number);
         } else {
-            $this->err = 'Nieprawidłowy typ numeru';
+            $this->set(Error::CLI_NUMBER);
             return false;
         }
         

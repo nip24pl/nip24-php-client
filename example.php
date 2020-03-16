@@ -36,7 +36,7 @@
 				echo '<pre>' . print_r($account, true) . '</pre>';
 			}
 			else {
-				echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+				echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 
 			// Sprawdzenie statusu fimy
@@ -50,7 +50,7 @@
 				    echo '<p>Firma zawiesiła lub zakończyła działalność</p>';
 			    }
 			    else {
-			        echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+                    echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			    }
 			}
 			
@@ -58,30 +58,20 @@
 			$vat = $nip24->getVATStatusExt(\NIP24\Number::NIP, $nip);
 			
 			if ($vat) {
-			    echo '<p>NIP: ' . $vat->nip . '</p>';
-			    echo '<p>REGON: ' . $vat->regon . '</p>';
-			    echo '<p>Nazwa firmy: ' . $vat->name . '</p>';
-			    echo '<p>Status: ' . $vat->status . '</p>';
-			    echo '<p>Wynik: ' . $vat->result . '</p>';
-			    echo '<p>Data sprawdzenia: ' . $vat->date . '</p>';
-			    echo '<p>Źródło: ' . $vat->source . '</p>';
+                echo '<pre>' . print_r($vat, true) . '</pre>';
 			}
 			else {
-			    echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 				
 			// Wywołanie metody zwracającej dane do faktury
 			$invoice = $nip24->getInvoiceDataExt(\NIP24\Number::NIP, $nip);
 			
 			if ($invoice) {
-				echo '<p>Nazwa: ' . $invoice->name . '</p>';
-				echo '<p>Imię i nazwisko: ' . $invoice->firstname . ' ' . $invoice->lastname . '</p>';
-				echo '<p>Adres: ' . $invoice->postCode . ' ' . $invoice->postCity . ' ' . $invoice->street
-					. ' ' . $invoice->streetNumber . '</p>';
-				echo '<p>NIP: ' . $invoice->nip . '</p>';
+                echo '<pre>' . print_r($invoice, true) . '</pre>';
 			}
 			else {
-				echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 			
 			// Wywołanie metody zwracającej szczegółowe dane firmy
@@ -91,7 +81,7 @@
 				echo '<pre>' . print_r($all, true) . '</pre>';
 			}
 			else {
-				echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 			
 			// Wywołanie metody zwracającej dane z systemu VIES
@@ -101,7 +91,7 @@
 			    echo '<pre>' . print_r($vies, true) . '</pre>';
 			}
 			else {
-			    echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 
 			// Wywołanie metody zwracającej informacje o rachunku bankowym
@@ -111,7 +101,7 @@
 			    echo '<pre>' . print_r($iban, true) . '</pre>';
 			}
 			else {
-			    echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 
             // Wywołanie metody sprawdzającej status podmiotu na białej liście podatników VAT
@@ -121,7 +111,17 @@
                 echo '<pre>' . print_r($whitelist, true) . '</pre>';
             }
             else {
-                echo '<p>Błąd: ' . $nip24->getLastError() . '</p>';
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
+            }
+
+            // Wywołanie metody wyszukującej dane w rejestrze VAT
+            $result = $nip24->searchVATRegistryExt(\NIP24\Number::NIP, $nip);
+
+            if ($result) {
+                echo '<pre>' . print_r($result, true) . '</pre>';
+            }
+            else {
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
             }
 		?>
 	</body>
