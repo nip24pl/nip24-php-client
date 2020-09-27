@@ -64,6 +64,8 @@ class AccountStatus
 	
 	public $jpk_vat;
 
+    public $cli;
+
     public $stats;
 
     public $nip_monitor;
@@ -136,6 +138,7 @@ class AccountStatus
             . ', terytCodes = ' . $this->teryt_codes
             . ', excelAddIn = ' . $this->excel_addin
             . ', jpkVat = ' . $this->jpk_vat
+            . ', cli = ' . $this->cli
             . ', stats = ' . $this->stats
             . ', NIPMonitor = ' . $this->nip_monitor
 

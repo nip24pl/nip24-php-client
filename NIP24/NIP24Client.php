@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.3.5';
+    const VERSION = '1.3.6';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -931,6 +931,7 @@ class NIP24Client
 		$as->teryt_codes = ($this->xpath($doc, '/result/account/billingPlan/terytCodes/text()') == 'true' ? true : false);
 		$as->excel_addin = ($this->xpath($doc, '/result/account/billingPlan/excelAddin/text()') == 'true' ? true : false);
 		$as->jpk_vat = ($this->xpath($doc, '/result/account/billingPlan/jpkVat/text()') == 'true' ? true : false);
+        $as->cli = ($this->xpath($doc, '/result/account/billingPlan/cli/text()') == 'true' ? true : false);
 		$as->stats = ($this->xpath($doc, '/result/account/billingPlan/stats/text()') == 'true' ? true : false);
 		$as->nip_monitor = ($this->xpath($doc, '/result/account/billingPlan/nipMonitor/text()') == 'true' ? true : false);
 		
