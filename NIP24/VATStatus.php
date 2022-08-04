@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2020 NETCAT (www.netcat.pl)
+ * Copyright 2015-2022 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2020 NETCAT (www.netcat.pl)
+ * @copyright 2015-2022 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -42,6 +42,8 @@ class VATStatus
 
     public $result;
 
+    public $id;
+
     public $date;
 
     public $source;
@@ -58,6 +60,7 @@ class VATStatus
             . ', name = ' . $this->name
             . ', status = ' . $this->status
             . ', result = ' . $this->result
+            . ', id = ' . $this->id
             . ', date = ' . $this->date
             . ', source = ' . $this->source
             . ']';

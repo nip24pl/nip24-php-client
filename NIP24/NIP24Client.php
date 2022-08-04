@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2020 NETCAT (www.netcat.pl)
+ * Copyright 2015-2022 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  * 
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2020 NETCAT (www.netcat.pl)
+ * @copyright 2015-2022 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.3.6';
+    const VERSION = '1.3.7';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -552,7 +552,8 @@ class NIP24Client
         
         $vs->status = intval($this->xpath($doc, '/result/vat/status/text()'));
         $vs->result = $this->xpath($doc, '/result/vat/result/text()');
-        
+
+        $vs->id = $this->xpath($doc, '/result/vat/id/text()');
         $vs->date = $this->xpathDate($doc, '/result/vat/date/text()');
         $vs->source = $this->xpath($doc, '/result/vat/source/text()');
         
