@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.3.7';
+    const VERSION = '1.3.8';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';

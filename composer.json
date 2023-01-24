@@ -1,6 +1,6 @@
 {
 	"name": "nip24/client",
-	"description": "VIES Client for PHP",
+	"description": "NIP24 Client for PHP",
 	"type": "library",
 	"keywords": [ "nip24", "api", "vat", "nip", "regon", "krs", "iban", "whitelist", "ceidg", "gus", "eu", "vies", "validator" ],
 	"license": "Apache-2.0",

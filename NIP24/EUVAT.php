@@ -28,39 +28,39 @@ class EUVAT
 {
     /**
      * Normalizes form of the VAT number
-     * @param string $nip input string
+     * @param string $number input string
      * @return string|false
      */
-    public static function normalize($nip)
+    public static function normalize($number)
     {
-        if (is_null($nip) || strlen($nip) <= 2) {
+        if (is_null($number) || strlen($number) <= 2) {
             return false;
         }
         
-        $nip = str_replace(array(' ', '-'), '', $nip);
-        $nip = strtoupper(trim($nip));
+        $number = str_replace(array(' ', '-'), '', $number);
+        $number = strtoupper(trim($number));
 
-		if (preg_match('/^[A-Z]{2}[A-Z0-9]{2,12}$/', $nip) != 1) {
+		if (preg_match('/^[A-Z]{2}[A-Z0-9+*]{2,12}$/', $number) != 1) {
 			return false;
 		}
         
-        return $nip;
+        return $number;
     }
 
     /**
      * Checks if specified NIP is valid
-     * @param string $nip input number
+     * @param string $number input number
      * @return bool
      */
-    public static function isValid($nip)
+    public static function isValid($number)
     {
-        if (! ($nip = self::normalize($nip))) {
+        if (! ($number = self::normalize($number))) {
             return false;
         }
         
 		$map = array(
 			'AT' => '/^ATU\\d{8}$/',
-			'BE' => '/^BE0\\d{9}$/',
+			'BE' => '/^BE[0-1]{1}\\d{9}$/',
 			'BG' => '/^BG\\d{9,10}$/',
 			'CY' => '/^CY\\d{8}[A-Z]{1}$/',
 			'CZ' => '/^CZ\\d{8,10}$/',
@@ -68,35 +68,35 @@ class EUVAT
 			'DK' => '/^DK\\d{8}$/',
 			'EE' => '/^EE\\d{9}$/',
 			'EL' => '/^EL\\d{9}$/',
-			'ES' => '/^ES[A-Z0-9]{9}$/',
+			'ES' => '/^ES[A-Z0-9]{1}\\d{7}[A-Z0-9]{1}$/',
 			'FI' => '/^FI\\d{8}$/',
 			'FR' => '/^FR[A-Z0-9]{2}\\d{9}$/',
-			'GB' => '/^GB[A-Z0-9]{5,12}$/',
 			'HR' => '/^HR\\d{11}$/',
 			'HU' => '/^HU\\d{8}$/',
-			'IE' => '/^IE[A-Z0-9]{8,9}$/',
+			'IE' => '/^IE[A-Z0-9+*]{8,9}$/',
 			'IT' => '/^IT\\d{11}$/',
 			'LT' => '/^LT\\d{9,12}$/',
 			'LU' => '/^LU\\d{8}$/',
 			'LV' => '/^LV\\d{11}$/',
 			'MT' => '/^MT\\d{8}$/',
-			'NL' => '/^NL\\d{9}B\\d{2}$/',
+			'NL' => '/^NL[A-Z0-9+*]{12}$/',
 			'PL' => '/^PL\\d{10}$/',
 			'PT' => '/^PT\\d{9}$/',
 			'RO' => '/^RO\\d{2,10}$/',
 			'SE' => '/^SE\\d{12}$/',
 			'SI' => '/^SI\\d{8}$/',
 			'SK' => '/^SK\\d{10}$/',
+            'XI' => '/^XI[A-Z0-9]{5,12}$/'
 		);
 		
-        $cc = substr($nip, 0, 2);
-        $num = substr($nip, 2);
+        $cc = substr($number, 0, 2);
+        $num = substr($number, 2);
 		
 		if (!array_key_exists($cc, $map)) {
 			return false;
 		}
 
-		if (preg_match($map[$cc], $nip) != 1) {
+		if (preg_match($map[$cc], $number) != 1) {
 			return false;
 		}
         
