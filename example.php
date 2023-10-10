@@ -28,6 +28,7 @@
 			$nip = '7171642051';
 			$nip_eu = 'PL' . $nip;
 			$account_number = '49154000046458439719826658';
+            $krs = '0000030897';
 
 			// Sprawdzenie stanu konta
 			$account = $nip24->getAccountStatus();
@@ -119,6 +120,26 @@
 
             if ($result) {
                 echo '<pre>' . print_r($result, true) . '</pre>';
+            }
+            else {
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
+            }
+
+            // Wywołanie metody pobierającej pełne dane z KRS
+            $krs_data = $nip24->getKRSData(\NIP24\Number::KRS, $krs);
+
+            if ($krs_data) {
+                echo '<pre>' . print_r($krs_data, true) . '</pre>';
+            }
+            else {
+                echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
+            }
+
+            // Wywołanie metody pobierającej dane z KRS (tylko dział 1)
+            $krs_section = $nip24->getKRSSection(\NIP24\Number::KRS, $krs, 1);
+
+            if ($krs_section) {
+                echo '<pre>' . print_r($krs_section, true) . '</pre>';
             }
             else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';

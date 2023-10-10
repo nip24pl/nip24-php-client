@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2022 NETCAT (www.netcat.pl)
+ * Copyright 2015-2023 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2022 NETCAT (www.netcat.pl)
+ * @copyright 2015-2023 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -49,6 +49,10 @@ class AccountStatus
     public $item_price_whitelist;
 
     public $item_price_search_vat;
+
+    public $item_price_krs_data;
+
+    public $item_price_krs_section;
 
     public $limit;
 
@@ -92,6 +96,10 @@ class AccountStatus
 
     public $func_search_vat;
 
+    public $func_get_krs_data;
+
+    public $func_get_krs_section;
+
     public $invoice_data_count;
 
     public $all_data_count;
@@ -107,6 +115,10 @@ class AccountStatus
 	public $whitelist_status_count;
 
 	public $search_vat_count;
+
+    public $krs_data_count;
+
+    public $krs_section_count;
 
     public $total_count;
 
@@ -129,6 +141,8 @@ class AccountStatus
             . ', itemPriceIBAN = ' . $this->item_price_iban
             . ', itemPriceWhitelist = ' . $this->item_price_whitelist
             . ', itemPriceSearchVAT = ' . $this->item_price_search_vat
+            . ', itemPriceKRSData = ' . $this->item_price_krs_data
+            . ', itemPriceKRSSection = ' . $this->item_price_krs_section
 
             . ', limit = ' . $this->limit
             . ', requestDelay = ' . $this->request_delay
@@ -154,6 +168,8 @@ class AccountStatus
             . ', funcGetIBANStatus = ' . $this->func_get_iban_status
             . ', funcGetWhitelistStatus = ' . $this->func_get_whitelist_status
             . ', funcSearchVAT = ' . $this->func_search_vat
+            . ', funcGetKRSData = ' . $this->func_get_krs_data
+            . ', funcGetKRSSection = ' . $this->func_get_krs_section
 
             . ', invoiceDataCount = ' . $this->invoice_data_count
             . ', allDataCount = ' . $this->all_data_count
@@ -163,6 +179,8 @@ class AccountStatus
             . ', IBANStatusCount = ' . $this->iban_status_count
             . ', whitelistStatusCount = ' . $this->whitelist_status_count
             . ', searchVATCount = ' . $this->search_vat_count
+            . ', KRSDataCount = ' . $this->krs_data_count
+            . ', KRSSectionCount = ' . $this->krs_section_count
             . ', totalCount = ' . $this->total_count
             . ']';
     }

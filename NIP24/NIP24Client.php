@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2022 NETCAT (www.netcat.pl)
+ * Copyright 2015-2023 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  * 
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2022 NETCAT (www.netcat.pl)
+ * @copyright 2015-2023 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.3.8';
+    const VERSION = '1.3.9';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -47,33 +47,11 @@ class NIP24Client
      */
     public static function autoload($className)
     {
-        $files = array(
-			'Error.php',
-            'PKD.php',
-			'AccountStatus.php',
-            'InvoiceData.php',
-            'AllData.php',
-            'VIESData.php',
-            'VATStatus.php',
-			'IBANStatus.php',
-            'WLStatus.php',
-            'SearchResult.php',
-            'VATEntity.php',
-            'VATPerson.php',
-            'NIP.php',
-            'EUVAT.php',
-            'REGON.php',
-            'KRS.php',
-			'IBAN.php',
-            'Number.php'
-        );
-        
-        foreach ($files as $file) {
-            $path = __DIR__ . DIRECTORY_SEPARATOR . $file;
-            
-            if (file_exists($path)) {
-                require_once $path;
-            }
+        $className = str_replace('NIP24\\', '', $className);
+        $path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
+
+        if (file_exists($path)) {
+            require $path;
         }
     }
 
@@ -82,6 +60,35 @@ class NIP24Client
      */
     public static function registerAutoloader()
     {
+        $files = array(
+            'Error.php',
+            'PKD.php',
+            'AccountStatus.php',
+            'InvoiceData.php',
+            'AllData.php',
+            'VIESData.php',
+            'VATStatus.php',
+            'IBANStatus.php',
+            'WLStatus.php',
+            'SearchResult.php',
+            'VATEntity.php',
+            'VATPerson.php',
+            'NIP.php',
+            'EUVAT.php',
+            'REGON.php',
+            'KRS.php',
+            'IBAN.php',
+            'Number.php'
+        );
+
+        foreach ($files as $file) {
+            $path = __DIR__ . DIRECTORY_SEPARATOR . $file;
+
+            if (file_exists($path)) {
+                require_once $path;
+            }
+        }
+
         spl_autoload_register(__NAMESPACE__ . '\\NIP24Client::autoload');
     }
 
@@ -873,6 +880,80 @@ class NIP24Client
     }
 
     /**
+     * Get all data from KRS registry
+     *
+     * @param int $type
+     *            search number type as Number::xxx value
+     * @param string $number
+     *            search number value
+     * @return \NIP24\Model\KRSData|false
+     */
+    public function getKRSData($type, $number)
+    {
+        return $this->getKRSSection($type, $number, 0);
+    }
+
+    /**
+     * Get data of one specific section from KRS registry
+     *
+     * @param int $type
+     *            search number type as Number::xxx value
+     * @param string $number
+     *            search number value
+     * @param int $section
+     *            number of section to get [1-6]
+     * @return \NIP24\Model\KRSData|false
+     */
+    public function getKRSSection($type, $number, $section)
+    {
+        // clear error
+        $this->clear();
+
+        // validate number and construct path
+        if (! ($suffix = $this->getPathSuffix($type, $number))) {
+            return false;
+        }
+
+        if ($section < 0 || $section > 6) {
+            $this->set(Error::CLI_INPUT);
+            return false;
+        }
+
+        $url = ($this->url . '/get/krs/current/' . $suffix . '/' . $section);
+
+        // send request
+        $res = $this->get($url);
+
+        if (! $res) {
+            $this->set(Error::CLI_CONNECT);
+            return false;
+        }
+
+        // parse response
+        $doc = json_decode($res);
+
+        if (! $doc) {
+            $this->set(Error::CLI_RESPONSE);
+            return false;
+        }
+
+        if (isset($doc->error) && isset($doc->error->code)) {
+            $this->set(intval($doc->error->code), $doc->error->description);
+            return false;
+        }
+
+        // parse response
+        $kd = ObjectSerializer::deserialize($doc->krs, '\NIP24\Model\KRSData');
+
+        if ($kd == null) {
+            $this->set(Error::CLI_RESPONSE);
+            return false;
+        }
+
+        return $kd;
+    }
+
+    /**
      * Get current account status
      * 
      * @return AccountStatus|false
@@ -923,6 +1004,8 @@ class NIP24Client
 		$as->item_price_iban = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceIBANStatus/text()'));
         $as->item_price_whitelist = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceWLStatus/text()'));
         $as->item_price_search_vat = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceSearchVAT/text()'));
+        $as->item_price_krs_data = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceKRSData/text()'));
+        $as->item_price_krs_section = floatval($this->xpath($doc, '/result/account/billingPlan/itemPriceKRSSection/text()'));
 		
 		$as->limit = intval($this->xpath($doc, '/result/account/billingPlan/limit/text()'));
 		$as->request_delay = intval($this->xpath($doc, '/result/account/billingPlan/requestDelay/text()'));
@@ -948,6 +1031,8 @@ class NIP24Client
 		$as->func_get_iban_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetIBANStatus/text()') == 'true' ? true : false);
         $as->func_get_whitelist_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetWLStatus/text()') == 'true' ? true : false);
         $as->func_search_vat = ($this->xpath($doc, '/result/account/billingPlan/funcSearchVAT/text()') == 'true' ? true : false);
+        $as->func_get_krs_data = ($this->xpath($doc, '/result/account/billingPlan/funcGetKRSData/text()') == 'true' ? true : false);
+        $as->func_get_krs_section = ($this->xpath($doc, '/result/account/billingPlan/funcGetKRSSection/text()') == 'true' ? true : false);
 		
 		$as->invoice_data_count = intval($this->xpath($doc, '/result/account/requests/invoiceData/text()'));
 		$as->all_data_count = intval($this->xpath($doc, '/result/account/requests/allData/text()'));
@@ -957,6 +1042,8 @@ class NIP24Client
 		$as->iban_status_count = intval($this->xpath($doc, '/result/account/requests/ibanStatus/text()'));
         $as->whitelist_status_count = intval($this->xpath($doc, '/result/account/requests/wlStatus/text()'));
         $as->search_vat_count = intval($this->xpath($doc, '/result/account/requests/searchVAT/text()'));
+        $as->krs_data_count = intval($this->xpath($doc, '/result/account/requests/krsData/text()'));
+        $as->krs_section_count = intval($this->xpath($doc, '/result/account/requests/krsSection/text()'));
 		$as->total_count = intval($this->xpath($doc, '/result/account/requests/total/text()'));
         
         return $as;
