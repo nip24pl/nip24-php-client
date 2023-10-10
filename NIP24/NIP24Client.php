@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.3.9';
+    const VERSION = '1.4.0';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -922,7 +922,7 @@ class NIP24Client
         $url = ($this->url . '/get/krs/current/' . $suffix . '/' . $section);
 
         // send request
-        $res = $this->get($url);
+        $res = $this->get($url, 'application/json');
 
         if (! $res) {
             $this->set(Error::CLI_CONNECT);
@@ -1163,9 +1163,11 @@ class NIP24Client
      * 
      * @param string $url
      *            target URL
+     * @param string $mimetype
+     *            requested response MIME type (application/xml or application/json)
      * @return string|false
      */
-    private function get($url)
+    private function get($url, $mimetype = 'application/xml')
     {
         // auth
         $auth = $this->auth('GET', $url);
@@ -1176,8 +1178,9 @@ class NIP24Client
         
         // headers
         $headers = array(
-            $this->userAgent(),
-            $auth
+            'Accept: ' . $mimetype,
+            $auth,
+            $this->userAgent()
         );
         
         // send request
