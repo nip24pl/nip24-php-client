@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2023 NETCAT (www.netcat.pl)
+ * Copyright 2015-2024 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  * 
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2023 NETCAT (www.netcat.pl)
+ * @copyright 2015-2024 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.4.0';
+    const VERSION = '1.4.1';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -62,6 +62,7 @@ class NIP24Client
     {
         $files = array(
             'Error.php',
+            'BusinessPartner.php',
             'PKD.php',
             'AccountStatus.php',
             'InvoiceData.php',
@@ -410,24 +411,45 @@ class NIP24Client
         $data->ownershipFormName = $this->xpath($doc, '/result/firm/ownershipForm/name/text()');
         
         for ($i = 1;; $i ++) {
-            $code = $this->xpath($doc, '/result/firm/PKDs/PKD[' . $i . ']/code/text()');
+            $code = $this->xpath($doc, '/result/firm/businessPartners/businessPartner[' . $i . ']/regon/text()');
             
             if (! $code) {
                 break;
             }
             
+            $firm = $this->xpath($doc, '/result/firm/businessPartners/businessPartner[' . $i . ']/firmName/text()');
+            $first = $this->xpath($doc, '/result/firm/businessPartners/businessPartner[' . $i . ']/firstName/text()');
+            $second = $this->xpath($doc, '/result/firm/businessPartners/businessPartner[' . $i . ']/secondName/text()');
+            $last = $this->xpath($doc, '/result/firm/businessPartners/businessPartner[' . $i . ']/lastName/text()');
+            
+            $partner = new BusinessPartner();
+            $partner->regon = $code;
+            $partner->firmName = $firm;
+            $partner->firstName = $first;
+            $partner->secondName = $second;
+            $partner->lastName = $last;
+            
+            $data->businessPartner[] = $partner;
+        }
+
+        for ($i = 1;; $i ++) {
+            $code = $this->xpath($doc, '/result/firm/PKDs/PKD[' . $i . ']/code/text()');
+
+            if (! $code) {
+                break;
+            }
+
             $descr = $this->xpath($doc, '/result/firm/PKDs/PKD[' . $i . ']/description/text()');
             $pri = $this->xpath($doc, '/result/firm/PKDs/PKD[' . $i . ']/primary/text()');
-            
+
             $pkd = new PKD();
-            
             $pkd->code = $code;
             $pkd->description = $descr;
             $pkd->primary = ($pri == 'true' ? true : false);
-            
-            array_push($data->pkd, $pkd);
+
+            $data->pkd[] = $pkd;
         }
-        
+
         return $data;
     }
 
