@@ -58,7 +58,8 @@ class PKD implements ModelInterface, ArrayAccess
     protected static $swaggerTypes = [
         'code' => 'string',
 'description' => 'string',
-'primary' => 'bool'    ];
+'primary' => 'bool',
+'version' => 'string'];
 
     /**
       * Array of property to format mappings. Used for (de)serialization
@@ -68,7 +69,8 @@ class PKD implements ModelInterface, ArrayAccess
     protected static $swaggerFormats = [
         'code' => null,
 'description' => null,
-'primary' => null    ];
+'primary' => null,
+'version' => null];
 
     /**
      * Array of property to type mappings. Used for (de)serialization
@@ -99,7 +101,8 @@ class PKD implements ModelInterface, ArrayAccess
     protected static $attributeMap = [
         'code' => 'code',
 'description' => 'description',
-'primary' => 'primary'    ];
+'primary' => 'primary',
+'version' => 'version'];
 
     /**
      * Array of attributes to setter functions (for deserialization of responses)
@@ -109,7 +112,8 @@ class PKD implements ModelInterface, ArrayAccess
     protected static $setters = [
         'code' => 'setCode',
 'description' => 'setDescription',
-'primary' => 'setPrimary'    ];
+'primary' => 'setPrimary',
+'version' => 'setVersion'];
 
     /**
      * Array of attributes to getter functions (for serialization of requests)
@@ -119,7 +123,8 @@ class PKD implements ModelInterface, ArrayAccess
     protected static $getters = [
         'code' => 'getCode',
 'description' => 'getDescription',
-'primary' => 'getPrimary'    ];
+'primary' => 'getPrimary',
+'version' => 'getVersion'];
 
     /**
      * Array of attributes where the key is the local name,
@@ -182,6 +187,7 @@ class PKD implements ModelInterface, ArrayAccess
         $this->container['code'] = isset($data['code']) ? $data['code'] : null;
         $this->container['description'] = isset($data['description']) ? $data['description'] : null;
         $this->container['primary'] = isset($data['primary']) ? $data['primary'] : null;
+        $this->container['version'] = isset($data['version']) ? $data['version'] : null;
     }
 
     /**
@@ -201,6 +207,9 @@ class PKD implements ModelInterface, ArrayAccess
         }
         if ($this->container['primary'] === null) {
             $invalidProperties[] = "'primary' can't be null";
+        }
+        if ($this->container['version'] === null) {
+            $invalidProperties[] = "'version' can't be null";
         }
         return $invalidProperties;
     }
@@ -288,6 +297,31 @@ class PKD implements ModelInterface, ArrayAccess
 
         return $this;
     }
+
+    /**
+     * Gets version
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->container['version'];
+    }
+
+    /**
+     * Sets version
+     *
+     * @param string $version version
+     *
+     * @return $this
+     */
+    public function setVersion($version)
+    {
+        $this->container['version'] = $version;
+
+        return $this;
+    }
+
     /**
      * Returns true if offset exists. False otherwise.
      *

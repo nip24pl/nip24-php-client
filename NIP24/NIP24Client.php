@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2024 NETCAT (www.netcat.pl)
+ * Copyright 2015-2025 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  * 
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2024 NETCAT (www.netcat.pl)
+ * @copyright 2015-2025 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,7 +26,7 @@ namespace NIP24;
  */
 class NIP24Client
 {
-    const VERSION = '1.4.1';
+    const VERSION = '1.4.3';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -391,6 +391,7 @@ class NIP24Client
         $data->renevalDate = $this->xpathDateTime($doc, '/result/firm/renevalDate/text()');
         $data->lastUpdateDate = $this->xpathDateTime($doc, '/result/firm/lastUpdateDate/text()');
         $data->endDate = $this->xpathDateTime($doc, '/result/firm/endDate/text()');
+        $data->deletionDate = $this->xpathDateTime($doc, '/result/firm/deletionDate/text()');
         
         $data->registryEntityCode = $this->xpath($doc, '/result/firm/registryEntity/code/text()');
         $data->registryEntityName = $this->xpath($doc, '/result/firm/registryEntity/name/text()');
@@ -441,11 +442,13 @@ class NIP24Client
 
             $descr = $this->xpath($doc, '/result/firm/PKDs/PKD[' . $i . ']/description/text()');
             $pri = $this->xpath($doc, '/result/firm/PKDs/PKD[' . $i . ']/primary/text()');
+            $ver = $this->xpath($doc, '/result/firm/PKDs/PKD[' . $i . ']/version/text()');
 
             $pkd = new PKD();
             $pkd->code = $code;
             $pkd->description = $descr;
             $pkd->primary = ($pri == 'true' ? true : false);
+            $pkd->version = $ver;
 
             $data->pkd[] = $pkd;
         }

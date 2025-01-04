@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="pl">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
