@@ -26,25 +26,25 @@ namespace NIP24;
  */
 class VIESData
 {
-    public $uid;
+    public string $uid;
     
-    public $countryCode;
+    public string $countryCode;
 
-    public $vatNumber;
+    public string $vatNumber;
 
-    public $valid;
+    public bool $valid;
 
-    public $traderName;
+    public string $traderName;
 
-    public $traderCompanyType;
+    public string $traderCompanyType;
 
-    public $traderAddress;
+    public string $traderAddress;
 
-    public $id;
+    public string $id;
 
-    public $date;
+    public string $date;
 
-    public $source;
+    public string $source;
 
     /**
      * Get object data as string

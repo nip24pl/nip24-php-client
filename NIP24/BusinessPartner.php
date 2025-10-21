@@ -26,15 +26,15 @@ namespace NIP24;
  */
 class BusinessPartner
 {
-    public $regon;
+    public string $regon;
 
-    public $firmName;
+    public string $firmName;
 
-    public $firstName;
+    public string $firstName;
 
-    public $secondName;
+    public string $secondName;
 
-    public $lastName;
+    public string $lastName;
 
     /**
      * Get object data as string

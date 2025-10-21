@@ -26,33 +26,33 @@ namespace NIP24;
  */
 class InvoiceData
 {
-    public $uid;
+    public string $uid;
     
-    public $nip;
+    public string $nip;
 
-    public $name;
+    public string $name;
 
-    public $firstname;
+    public string $firstname;
 
-    public $lastname;
+    public string $lastname;
 
-    public $street;
+    public string $street;
 
-    public $streetNumber;
+    public string $streetNumber;
 
-    public $houseNumber;
+    public string $houseNumber;
 
-    public $city;
+    public string $city;
 
-    public $postCode;
+    public string $postCode;
 
-    public $postCity;
+    public string $postCity;
 
-    public $phone;
+    public string $phone;
 
-    public $email;
+    public string $email;
 
-    public $www;
+    public string $www;
     
     /**
      * Get object data as string

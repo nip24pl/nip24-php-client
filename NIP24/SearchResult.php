@@ -26,15 +26,15 @@ namespace NIP24;
  */
 class SearchResult
 {
-    public $uid;
+    public string $uid;
 
-    public $results;
+    public array $results;
     
-    public $id;
+    public string $id;
 
-    public $date;
+    public string $date;
 
-    public $source;
+    public string $source;
 
     public function __construct()
     {
@@ -48,7 +48,7 @@ class SearchResult
     public function __toString()
     {
         return 'SearchResult: [uid = ' . $this->uid
-            . ', results = ' . $this->results
+            . ', results = ' . implode(', ', $this->results)
             . ', id = ' . $this->id
             . ', date = ' . $this->date
             . ', source = ' . $this->source

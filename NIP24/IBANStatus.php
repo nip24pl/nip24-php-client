@@ -26,21 +26,21 @@ namespace NIP24;
  */
 class IBANStatus
 {
-    public $uid;
+    public string $uid;
     
-    public $nip;
+    public string $nip;
     
-    public $regon;
+    public string $regon;
 	
-	public $iban;
+	public string $iban;
 
-    public $valid;
+    public bool $valid;
 
-    public $id;
+    public string $id;
 
-    public $date;
+    public string $date;
 
-    public $source;
+    public string $source;
 
     /**
      * Get object data as string

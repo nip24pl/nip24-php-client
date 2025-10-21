@@ -2,7 +2,6 @@
 <html lang="pl">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-
 		<title>NIP24 Client - Example</title>
 	</head>
 
@@ -35,8 +34,7 @@
 
 			if ($account) {
 				echo '<pre>' . print_r($account, true) . '</pre>';
-			}
-			else {
+			} else {
 				echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 
@@ -45,12 +43,10 @@
 			
 			if ($active) {
 				echo '<p>Firma prowadzi aktywną działalność</p>';
-			}
-			else {
+			} else {
 			    if (!$nip24->getLastError()) {
 				    echo '<p>Firma zawiesiła lub zakończyła działalność</p>';
-			    }
-			    else {
+			    } else {
                     echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			    }
 			}
@@ -60,8 +56,7 @@
 			
 			if ($vat) {
                 echo '<pre>' . print_r($vat, true) . '</pre>';
-			}
-			else {
+			} else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 				
@@ -70,8 +65,7 @@
 			
 			if ($invoice) {
                 echo '<pre>' . print_r($invoice, true) . '</pre>';
-			}
-			else {
+			} else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 			
@@ -80,8 +74,7 @@
 			
 			if ($all) {
 				echo '<pre>' . print_r($all, true) . '</pre>';
-			}
-			else {
+			} else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 			
@@ -90,8 +83,7 @@
 				
 			if ($vies) {
 			    echo '<pre>' . print_r($vies, true) . '</pre>';
-			}
-			else {
+			} else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 
@@ -100,8 +92,7 @@
 				
 			if ($iban) {
 			    echo '<pre>' . print_r($iban, true) . '</pre>';
-			}
-			else {
+			} else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
 			}
 
@@ -110,8 +101,7 @@
 
             if ($whitelist) {
                 echo '<pre>' . print_r($whitelist, true) . '</pre>';
-            }
-            else {
+            } else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
             }
 
@@ -120,8 +110,7 @@
 
             if ($result) {
                 echo '<pre>' . print_r($result, true) . '</pre>';
-            }
-            else {
+            } else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
             }
 
@@ -130,8 +119,7 @@
 
             if ($krs_data) {
                 echo '<pre>' . print_r($krs_data, true) . '</pre>';
-            }
-            else {
+            } else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
             }
 
@@ -140,8 +128,7 @@
 
             if ($krs_section) {
                 echo '<pre>' . print_r($krs_section, true) . '</pre>';
-            }
-            else {
+            } else {
                 echo '<p>Błąd: ' . $nip24->getLastError() . ' (kod: ' . $nip24->getLastErrorCode() . ')</p>';
             }
 		?>

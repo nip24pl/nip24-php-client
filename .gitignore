@@ -5,3 +5,7 @@
 *.ipr
 
 ### Local
+*.lock
+*.phar
+/backup/
+/vendor/

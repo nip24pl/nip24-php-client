@@ -28,10 +28,10 @@ class EUVAT
 {
     /**
      * Normalizes form of the VAT number
-     * @param string $number input string
+     * @param string|null $number input string
      * @return string|false
      */
-    public static function normalize($number)
+    public static function normalize(?string $number)
     {
         if (is_null($number) || strlen($number) <= 2) {
             return false;
@@ -49,10 +49,10 @@ class EUVAT
 
     /**
      * Checks if specified NIP is valid
-     * @param string $number input number
+     * @param string|null $number input number
      * @return bool
      */
-    public static function isValid($number)
+    public static function isValid(?string $number): bool
     {
         if (! ($number = self::normalize($number))) {
             return false;

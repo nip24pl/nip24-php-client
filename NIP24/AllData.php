@@ -26,73 +26,77 @@ namespace NIP24;
  */
 class AllData extends InvoiceData
 {
-    public $type;
+    public string $type;
 
-    public $regon;
+    public string $regon;
 
-    public $shortname;
+    public string $shortname;
 
-    public $secondname;
+    public string $secondname;
 
-    public $streetCode;
+    public string $streetCode;
     
-    public $cityCode;
+    public string $cityCode;
     
-    public $community;
+    public string $community;
     
-    public $communityCode;
+    public string $communityCode;
 
-    public $county;
+    public string $county;
     
-    public $countyCode;
+    public string $countyCode;
 
-    public $state;
+    public string $state;
     
-    public $stateCode;
+    public string $stateCode;
 
-    public $creationDate;
+    public string $creationDate;
 
-    public $startDate;
+    public string $startDate;
 
-    public $registrationDate;
+    public string $registrationDate;
 
-    public $holdDate;
+    public string $holdDate;
 
-    public $renevalDate;
+    public string $renevalDate;
 
-    public $lastUpdateDate;
+    public string $lastUpdateDate;
 
-    public $endDate;
+    public string $bankruptcyDate;
 
-    public $deletionDate;
+    public string $endOfBankruptcyProceedingsDate;
 
-    public $registryEntityCode;
+    public string $endDate;
 
-    public $registryEntityName;
+    public string $deletionDate;
 
-    public $registryCode;
+    public string $registryEntityCode;
 
-    public $registryName;
+    public string $registryEntityName;
 
-    public $recordCreationDate;
+    public string $registryCode;
 
-    public $recordNumber;
+    public string $registryName;
 
-    public $basicLegalFormCode;
+    public string $recordCreationDate;
 
-    public $basicLegalFormName;
+    public string $recordNumber;
 
-    public $specificLegalFormCode;
+    public string $basicLegalFormCode;
 
-    public $specificLegalFormName;
+    public string $basicLegalFormName;
 
-    public $ownershipFormCode;
+    public string $specificLegalFormCode;
 
-    public $ownershipFormName;
+    public string $specificLegalFormName;
 
-    public $businessPartner;
+    public string $ownershipFormCode;
 
-    public $pkd;
+    public string $ownershipFormName;
+
+    public array $businessPartner;
+
+    public array $pkd;
 
     public function __construct()
     {
@@ -142,6 +146,8 @@ class AllData extends InvoiceData
             . ', holdDate = ' . $this->holdDate
             . ', renevalDate = ' . $this->renevalDate
             . ', lastUpdateDate = ' . $this->lastUpdateDate
+            . ', bankruptcyDate = ' . $this->bankruptcyDate
+            . ', endOfBankruptcyProceedingsDate = ' . $this->endOfBankruptcyProceedingsDate
             . ', endDate = ' . $this->endDate
             . ', deletionDate = ' . $this->deletionDate
 

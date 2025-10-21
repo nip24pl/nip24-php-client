@@ -26,101 +26,101 @@ namespace NIP24;
  */
 class AccountStatus
 {
-    public $uid;
+    public string $uid;
 
-    public $type;
+    public string $type;
 
-    public $valid_to;
+    public string $valid_to;
 
-    public $billing_plan_name;
+    public string $billing_plan_name;
 
-    public $subscription_price;
+    public float $subscription_price;
 
-    public $item_price;
+    public float $item_price;
 
-    public $item_price_status;
+    public float $item_price_status;
 
-    public $item_price_invoice;
+    public float $item_price_invoice;
 
-    public $item_price_all;
+    public float $item_price_all;
 	
-	public $item_price_iban;
+	public float $item_price_iban;
 
-    public $item_price_whitelist;
+    public float $item_price_whitelist;
 
-    public $item_price_search_vat;
+    public float $item_price_search_vat;
 
-    public $item_price_krs_data;
+    public float $item_price_krs_data;
 
-    public $item_price_krs_section;
+    public float $item_price_krs_section;
 
-    public $limit;
+    public int $limit;
 
-    public $request_delay;
+    public int $request_delay;
 
-    public $domain_limit;
+    public int $domain_limit;
 
-    public $overplan_allowed;
+    public bool $overplan_allowed;
 
-    public $teryt_codes;
+    public bool $teryt_codes;
 
-    public $excel_addin;
+    public bool $excel_addin;
 	
-	public $jpk_vat;
+	public bool $jpk_vat;
 
-    public $cli;
+    public bool $cli;
 
-    public $stats;
+    public bool $stats;
 
-    public $nip_monitor;
+    public bool $nip_monitor;
 
-    public $search_by_nip;
+    public bool $search_by_nip;
 
-    public $search_by_regon;
+    public bool $search_by_regon;
 
-    public $search_by_krs;
+    public bool $search_by_krs;
 
-    public $func_is_active;
+    public bool $func_is_active;
 
-    public $func_get_invoice_data;
+    public bool $func_get_invoice_data;
 
-    public $func_get_all_data;
+    public bool $func_get_all_data;
 
-    public $func_get_vies_data;
+    public bool $func_get_vies_data;
 
-    public $func_get_vat_status;
+    public bool $func_get_vat_status;
 	
-	public $func_get_iban_status;
+	public bool $func_get_iban_status;
 
-    public $func_get_whitelist_status;
+    public bool $func_get_whitelist_status;
 
-    public $func_search_vat;
+    public bool $func_search_vat;
 
-    public $func_get_krs_data;
+    public bool $func_get_krs_data;
 
-    public $func_get_krs_section;
+    public bool $func_get_krs_section;
 
-    public $invoice_data_count;
+    public int $invoice_data_count;
 
-    public $all_data_count;
+    public int $all_data_count;
 
-    public $firm_status_count;
+    public int $firm_status_count;
 
-    public $vat_status_count;
+    public int $vat_status_count;
 
-    public $vies_status_count;
+    public int $vies_status_count;
 	
-	public $iban_status_count;
+	public int $iban_status_count;
 
-	public $whitelist_status_count;
+	public int $whitelist_status_count;
 
-	public $search_vat_count;
+	public int $search_vat_count;
 
-    public $krs_data_count;
+    public int $krs_data_count;
 
-    public $krs_section_count;
+    public int $krs_section_count;
 
-    public $total_count;
+    public int $total_count;
 
     /**
      * Get object data as string

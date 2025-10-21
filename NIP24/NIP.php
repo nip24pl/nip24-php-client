@@ -28,12 +28,10 @@ class NIP
 {
     /**
      * Normalizes form of the NIP number
-     * 
-     * @param string $nip
-     *            input string
+     * @param string|null $nip input string
      * @return string|false
      */
-    public static function normalize($nip)
+    public static function normalize(?string $nip)
     {
         if (is_null($nip) || strlen($nip) == 0) {
             return false;
@@ -51,29 +49,16 @@ class NIP
 
     /**
      * Checks if specified NIP is valid
-     * 
-     * @param string $nip
-     *            input number
+     * @param string|null $nip input number
      * @return bool
      */
-    public static function isValid($nip)
+    public static function isValid(?string $nip): bool
     {
         if (! ($nip = self::normalize($nip))) {
             return false;
         }
         
-        $w = array(
-            6,
-            5,
-            7,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
-        );
-        
+        $w = array(6, 5, 7, 2, 3, 4, 5, 6, 7);
         $sum = 0;
         
         for ($i = 0; $i < count($w); $i ++) {

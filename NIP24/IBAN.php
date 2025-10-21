@@ -26,12 +26,12 @@ namespace NIP24;
  */
 class IBAN
 {
-	/**
-	 * Normalizes form of the IBAN number
-	 * @param string $iban
-	 * @return string|false
-	 */
-	public static function normalize($iban)
+    /**
+     * Normalizes form of the IBAN number
+     * @param string|null $iban
+     * @return string|false
+     */
+	public static function normalize(?string $iban)
 	{
         if (is_null($iban) || strlen($iban) == 0) {
             return false;
@@ -46,14 +46,14 @@ class IBAN
 		
 		return $iban;
 	}
-	
-	/**
-	 * Check if specified IBAN is valid
-	 * @param string $iban input number
-	 * @return bool
-	 */
-	public static function isValid($iban)
-	{
+
+    /**
+     * Check if specified IBAN is valid
+     * @param string|null $iban input number
+     * @return bool
+     */
+	public static function isValid(?string $iban): bool
+    {
         if (! ($iban = self::normalize($iban))) {
             return false;
         }

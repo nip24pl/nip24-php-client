@@ -28,12 +28,10 @@ class KRS
 {
     /**
      * Normalizes form of the KRS number
-     * 
-     * @param string $krs
-     *            input string
+     * @param string|null $krs input string
      * @return string|false
      */
-    public static function normalize($krs)
+    public static function normalize(?string $krs)
     {
         if (is_null($krs) || strlen($krs) == 0) {
             return false;
@@ -51,12 +49,10 @@ class KRS
 
     /**
      * Checks if specified KRS is valid
-     * 
-     * @param string $krs
-     *            input number
+     * @param string|null $krs input number
      * @return bool
      */
-    public static function isValid($krs)
+    public static function isValid(?string $krs): bool
     {
         if (! ($krs = self::normalize($krs))) {
             return false;

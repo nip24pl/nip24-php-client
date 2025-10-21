@@ -26,13 +26,13 @@ namespace NIP24;
  */
 class VATPerson
 {
-    public $companyName;
+    public string $companyName;
 
-    public $firstName;
+    public string $firstName;
     
-    public $lastName;
+    public string $lastName;
 
-    public $nip;
+    public string $nip;
 
     /**
      * Get object data as string

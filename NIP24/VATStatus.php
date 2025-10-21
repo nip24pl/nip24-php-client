@@ -30,23 +30,23 @@ class VATStatus
     const ACTIVE = 2;
     const EXEMPTED = 3;
     
-    public $uid;
+    public string $uid;
     
-    public $nip;
+    public string $nip;
     
-    public $regon;
+    public string $regon;
 
-    public $name;
+    public string $name;
 
-    public $status;
+    public int $status;
 
-    public $result;
+    public string $result;
 
-    public $id;
+    public string $id;
 
-    public $date;
+    public string $date;
 
-    public $source;
+    public string $source;
 
     /**
      * Get object data as string

@@ -28,12 +28,10 @@ class REGON
 {
     /**
      * Normalizes form of the REGON number
-     * 
-     * @param string $regon
-     *            input string
+     * @param string|null $regon input string
      * @return string|false
      */
-    public static function normalize($regon)
+    public static function normalize(?string $regon)
     {
         if (is_null($regon) || strlen($regon) == 0) {
             return false;
@@ -54,12 +52,10 @@ class REGON
 
     /**
      * Checks if specified REGON is valid
-     * 
-     * @param string $regon
-     *            input number
+     * @param string|null $regon input number
      * @return true|false
      */
-    public static function isValid($regon)
+    public static function isValid(?string $regon): bool
     {
         $regon = self::normalize($regon);
         
@@ -80,24 +76,12 @@ class REGON
 
     /**
      * Check 9-digit REGON number
-     * 
-     * @param string $regon
-     *            input number
-     * @return true|false
+     * @param string $regon input number
+     * @return bool
      */
-    private static function isValidR9($regon)
+    private static function isValidR9(string $regon): bool
     {
-        $w = array(
-            8,
-            9,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
-        );
-        
+        $w = array(8, 9, 2, 3, 4, 5, 6, 7);
         $sum = 0;
         
         for ($i = 0; $i < count($w); $i ++) {
@@ -119,29 +103,12 @@ class REGON
 
     /**
      * Check 14-digit REGON number
-     * 
-     * @param string $regon
-     *            input number
-     * @return true|false
+     * @param string $regon input number
+     * @return bool
      */
-    private static function isValidR14($regon)
+    private static function isValidR14(string $regon): bool
     {
-        $w = array(
-            2,
-            4,
-            8,
-            5,
-            0,
-            9,
-            7,
-            3,
-            6,
-            1,
-            2,
-            4,
-            8
-        );
-        
+        $w = array(2, 4, 8, 5, 0, 9, 7, 3, 6, 1, 2, 4, 8);
         $sum = 0;
         
         for ($i = 0; $i < count($w); $i ++) {

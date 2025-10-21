@@ -26,13 +26,13 @@ namespace NIP24;
  */
 class PKD
 {
-    public $code;
+    public string $code;
 
-    public $description;
+    public string $description;
 
-    public $primary;
+    public bool $primary;
 
-    public $version;
+    public string $version;
 
     /**
      * Get object data as string

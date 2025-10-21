@@ -1,6 +1,6 @@
 {
 	"name": "nip24/client",
-    "version": "1.4.3",
+    "version": "1.4.5",
 	"description": "NIP24 Client for PHP",
 	"type": "library",
 	"keywords": [ "nip24", "api", "vat", "nip", "regon", "krs", "iban", "whitelist", "ceidg", "gus", "eu", "vies", "validator" ],
@@ -17,10 +17,10 @@
         "psr-4": { "NIP24\\": "NIP24/" }
     },
     "require": {
-		"php": ">=7.3",
-        "ext-simplexml": "*",
-        "ext-openssl": "*",
+		"php": ">=7.4",
         "ext-curl": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-simplexml": "*"
     }
 }

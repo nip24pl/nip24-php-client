@@ -26,27 +26,27 @@ namespace NIP24;
  */
 class WLStatus
 {
-    public $uid;
+    public string $uid;
     
-    public $nip;
+    public string $nip;
     
-	public $iban;
+	public string $iban;
 
-    public $valid;
+    public bool $valid;
 
-    public $virtual;
+    public bool $virtual;
 
-    public $vatStatus;
+    public int $vatStatus;
 
-    public $vatResult;
+    public string $vatResult;
 
-    public $hashIndex;
+    public int $hashIndex;
 
-    public $maskIndex;
+    public int $maskIndex;
 
-    public $date;
+    public string $date;
 
-    public $source;
+    public string $source;
 
     /**
      * Get object data as string

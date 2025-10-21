@@ -30,45 +30,45 @@ class VATEntity
     const ACTIVE = 2;
     const EXEMPTED = 3;
 
-    public $name;
+    public string $name;
 
-    public $nip;
+    public string $nip;
     
-    public $regon;
+    public string $regon;
 
-    public $krs;
+    public string $krs;
 
-    public $residenceAddress;
+    public string $residenceAddress;
 
-    public $workingAddress;
+    public string $workingAddress;
 
-    public $vatStatus;
+    public int $vatStatus;
 
-    public $vatResult;
+    public string $vatResult;
 
-    public $representatives;
+    public array $representatives;
 
-    public $authorizedClerks;
+    public array $authorizedClerks;
 
-    public $partners;
+    public array $partners;
 
-    public $ibans;
+    public array $ibans;
 
-    public $hasVirtualAccounts;
+    public bool $hasVirtualAccounts;
 
-    public $registrationLegalDate;
+    public string $registrationLegalDate;
 
-    public $registrationDenialDate;
+    public string $registrationDenialDate;
 
-    public $registrationDenialBasis;
+    public string $registrationDenialBasis;
 
-    public $restorationDate;
+    public string $restorationDate;
 
-    public $restorationBasis;
+    public string $restorationBasis;
 
-    public $removalDate;
+    public string $removalDate;
 
-    public $removalBasis;
+    public string $removalBasis;
 
     public function __construct()
     {

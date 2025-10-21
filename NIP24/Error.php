@@ -104,7 +104,7 @@ class Error
 	const CLI_DATEFORMAT        = 210;
 	const CLI_INPUT             = 211;
 
-	private static $codes = array(
+	private static array $codes = array(
 		self::CLI_CONNECT     => 'Nie udało się nawiązać połączenia z serwisem NIP24',
         self::CLI_RESPONSE    => 'Odpowiedź serwisu NIP24 ma nieprawidłowy format',
         self::CLI_NUMBER      => 'Nieprawidłowy typ numeru',
@@ -123,8 +123,8 @@ class Error
      * @param int $code error code
      * @return string error message
      */
-	public static function message($code)
-	{
+	public static function message(int $code): ?string
+    {
 	    if ($code < self::CLI_CONNECT || $code > self::CLI_INPUT) {
 	        return null;
         }

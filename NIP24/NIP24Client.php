@@ -21,12 +21,15 @@
 
 namespace NIP24;
 
+use NIP24\Model\KRSData;
+use SimpleXMLElement;
+
 /**
  * NIP24 service client
  */
 class NIP24Client
 {
-    const VERSION = '1.4.3';
+    const VERSION = '1.4.5';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -34,18 +37,18 @@ class NIP24Client
     const TEST_ID = 'test_id';
     const TEST_KEY = 'test_key';
 
-    private $url;
-    private $id;
-    private $key;
-    private $app;
+    private string $url;
+    private string $id;
+    private string $key;
+    private string $app;
 
-    private $errcode;
-    private $err;
+    private int $errcode;
+    private string $err;
 
     /**
      * NIP24 PSR-0 autoloader
      */
-    public static function autoload($className)
+    public static function autoload(string $className)
     {
         $className = str_replace('NIP24\\', '', $className);
         $path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
@@ -95,13 +98,10 @@ class NIP24Client
 
     /**
      * Construct new service client object
-     * 
-     * @param string $id
-     *            NIP24 key identifier
-     * @param string $key
-     *            NIP24 key
+     * @param string|null $id NIP24 key identifier
+     * @param string|null $key NIP24 key
      */
-    public function __construct($id = null, $key = null)
+    public function __construct(string $id = null, string $key = null)
     {
         $this->url = self::TEST_URL;
         $this->id = self::TEST_ID;
@@ -115,54 +115,43 @@ class NIP24Client
         
         $this->app = '';
         $this->clear();
-        
-        date_default_timezone_set('Europe/Warsaw');
     }
 
     /**
      * Set non default service URL
-     * 
-     * @param string $url
-     *            service URL
+     * @param string $url service URL
      */
-    public function setURL($url)
+    public function setURL(string $url)
     {
         $this->url = $url;
     }
 
     /**
      * Set application info
-     * 
-     * @param string $app
-     *            app info
+     * @param string $app app info
      */
-    public function setApp($app)
+    public function setApp(string $app)
     {
         $this->app = $app;
     }
 
     /**
      * Check frim activity
-     *
-     * @param string $nip
-     *            NIP number
-     * @return true|false
+     * @param string $nip NIP number
+     * @return bool
      */
-    public function isActive($nip)
+    public function isActive(string $nip): bool
     {
         return $this->isActiveExt(Number::NIP, $nip);
     }
     
     /**
-     * Check frim activity
-     * 
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @return true|false
+     * Check firm activity
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @return bool
      */
-    public function isActiveExt($type, $number)
+    public function isActiveExt(int $type, string $number): bool
     {
         // clear error
         $this->clear();
@@ -197,12 +186,10 @@ class NIP24Client
             if ($code == 9) {
                 // not active
                 $this->clear();
-                return false;
-            }
-            else {
+            } else {
                 $this->set(intval($code), $this->xpath($doc, '/result/error/description/text()'));
-                return false;
             }
+            return false;
         }
         
         // ok
@@ -211,30 +198,23 @@ class NIP24Client
     
     /**
      * Get invoice data for specified NIP number
-     *
-     * @param string $nip
-     *            NIP number
-     * @param bool $force
-     *            ignored, left for backward compatibility
+     * @param string $nip NIP number
+     * @param bool $force ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceData($nip, $force = true)
+    public function getInvoiceData(string $nip, bool $force = true)
     {
         return $this->getInvoiceDataExt(Number::NIP, $nip, $force);
     }
 
     /**
      * Get invoice data for specified number type
-     * 
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @param bool $force
-     *            ignored, left for backward compatibility
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @param bool $force ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceDataExt($type, $number, $force = true)
+    public function getInvoiceDataExt(int $type, string $number, bool $force = true)
     {
         // clear error
         $this->clear();
@@ -294,30 +274,23 @@ class NIP24Client
     
     /**
      * Get all data for specified NIP number
-     *
-     * @param string $nip
-     *            NIP number
-     * @param bool $force
-     *            ignored, left for backward compatibility
+     * @param string $nip NIP number
+     * @param bool $force ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllData($nip, $force = true)
+    public function getAllData(string $nip, bool $force = true)
     {
         return $this->getAllDataExt(Number::NIP, $nip, $force);
     }
 
     /**
      * Get all data for specified number type
-     * 
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @param bool $force
-     *            ignored, left for backward compatibility
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @param bool $force ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllDataExt($type, $number, $force = true)
+    public function getAllDataExt(int $type, string $number, bool $force = true)
     {
         // clear error
         $this->clear();
@@ -390,6 +363,8 @@ class NIP24Client
         $data->holdDate = $this->xpathDateTime($doc, '/result/firm/holdDate/text()');
         $data->renevalDate = $this->xpathDateTime($doc, '/result/firm/renevalDate/text()');
         $data->lastUpdateDate = $this->xpathDateTime($doc, '/result/firm/lastUpdateDate/text()');
+        $data->bankruptcyDate = $this->xpathDateTime($doc, '/result/firm/bankruptcyDate/text()');
+        $data->endOfBankruptcyProceedingsDate = $this->xpathDateTime($doc, '/result/firm/endOfBankruptcyProceedingsDate/text()');
         $data->endDate = $this->xpathDateTime($doc, '/result/firm/endDate/text()');
         $data->deletionDate = $this->xpathDateTime($doc, '/result/firm/deletionDate/text()');
         
@@ -447,7 +422,7 @@ class NIP24Client
             $pkd = new PKD();
             $pkd->code = $code;
             $pkd->description = $descr;
-            $pkd->primary = ($pri == 'true' ? true : false);
+            $pkd->primary = $pri == 'true';
             $pkd->version = $ver;
 
             $data->pkd[] = $pkd;
@@ -458,12 +433,10 @@ class NIP24Client
 
     /**
      * Get VIES data for specified number
-     *
-     * @param string $euvat
-     *            EU VAT number with 2-letter country prefix
+     * @param string $euvat EU VAT number with 2-letter country prefix
      * @return VIESData|false
      */
-    public function getVIESData($euvat)
+    public function getVIESData(string $euvat)
     {
         // clear error
         $this->clear();
@@ -504,7 +477,7 @@ class NIP24Client
         $vies->countryCode = $this->xpath($doc, '/result/vies/countryCode/text()');
         $vies->vatNumber = $this->xpath($doc, '/result/vies/vatNumber/text()');
         
-        $vies->valid = ($this->xpath($doc, '/result/vies/valid/text()') == 'true' ? true : false);
+        $vies->valid = $this->xpath($doc, '/result/vies/valid/text()') == 'true';
         
         $vies->traderName = $this->xpath($doc, '/result/vies/traderName/text()');
         $vies->traderCompanyType = $this->xpath($doc, '/result/vies/traderCompanyType/text()');
@@ -519,28 +492,22 @@ class NIP24Client
     
     /**
      * Check if firm is an active VAT payer
-     *
-     * @param string $nip
-     *            NIP number
+     * @param string $nip NIP number
      * @return VATStatus|false
      */
-    public function getVATStatus($nip)
+    public function getVATStatus(string $nip)
     {
         return $this->getVATStatusExt(Number::NIP, $nip, true);
     }
     
     /**
      * Check if firm is an active VAT payer
-     * 
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @param bool $direct
-     *            ignored, left for backward compatibility
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @param bool $direct ignored, left for backward compatibility
      * @return VATStatus|false
      */
-    public function getVATStatusExt($type, $number, $direct = true)
+    public function getVATStatusExt(int $type, string $number, bool $direct = true)
     {
         // clear error
         $this->clear();
@@ -594,34 +561,25 @@ class NIP24Client
     
     /**
      * Check if firm owns bank account number
-     *
-     * @param string $nip
-     *            NIP number
-     * @param string $iban
-     *            bank account IBAN (for polish numbers PL prefix may be omitted)
-     * @param string $date
-     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @param string $nip NIP number
+     * @param string $iban bank account IBAN (for polish numbers PL prefix may be omitted)
+     * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
-    public function getIBANStatus($nip, $iban, $date = null)
+    public function getIBANStatus(string $nip, string $iban, string $date = null)
     {
         return $this->getIBANStatusExt(Number::NIP, $nip, $iban, $date);
     }
     
     /**
      * Check if firm owns bank account number
-     * 
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @param string $iban
-     *            bank account IBAN (for polish numbers PL prefix may be omitted)
-     * @param string $date
-     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @param string $iban bank account IBAN (for polish numbers PL prefix may be omitted)
+     * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
-    public function getIBANStatusExt($type, $number, $iban, $date = null)
+    public function getIBANStatusExt(int $type, string $number, string $iban, string $date = null)
     {
         // clear error
         $this->clear();
@@ -677,7 +635,7 @@ class NIP24Client
         $is->regon = $this->xpath($doc, '/result/iban/regon/text()');
         $is->iban = $this->xpath($doc, '/result/iban/iban/text()');
         
-		$is->valid = ($this->xpath($doc, '/result/iban/valid/text()') == 'true' ? true : false);
+		$is->valid = $this->xpath($doc, '/result/iban/valid/text()') == 'true';
 
 		$is->id = $this->xpath($doc, '/result/iban/id/text()');
         $is->date = $this->xpathDate($doc, '/result/iban/date/text()');
@@ -688,34 +646,25 @@ class NIP24Client
 
     /**
      * Check bank account status and VAT status using whitelist file
-     *
-     * @param string $nip
-     *            NIP number
-     * @param string $iban
-     *            bank account IBAN (for polish numbers PL prefix may be omitted)
-     * @param string $date
-     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @param string $nip NIP number
+     * @param string $iban bank account IBAN (for polish numbers PL prefix may be omitted)
+     * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return WLStatus|false
      */
-    public function getWhitelistStatus($nip, $iban, $date = null)
+    public function getWhitelistStatus(string $nip, string $iban, string $date = null)
     {
         return $this->getWhitelistStatusExt(Number::NIP, $nip, $iban, $date);
     }
 
     /**
      * Check bank account status and VAT status using whitelist file
-     *
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @param string $iban
-     *            bank account IBAN (for polish numbers PL prefix may be omitted)
-     * @param string $date
-     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @param string $iban bank account IBAN (for polish numbers PL prefix may be omitted)
+     * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return WLStatus|false
      */
-    public function getWhitelistStatusExt($type, $number, $iban, $date = null)
+    public function getWhitelistStatusExt(int $type, string $number, string $iban, string $date = null)
     {
         // clear error
         $this->clear();
@@ -771,8 +720,8 @@ class NIP24Client
         $wl->nip = $this->xpath($doc, '/result/whitelist/nip/text()');
         $wl->iban = $this->xpath($doc, '/result/whitelist/iban/text()');
 
-        $wl->valid = ($this->xpath($doc, '/result/whitelist/valid/text()') == 'true' ? true : false);
-        $wl->virtual = ($this->xpath($doc, '/result/whitelist/virtual/text()') == 'true' ? true : false);
+        $wl->valid = $this->xpath($doc, '/result/whitelist/valid/text()') == 'true';
+        $wl->virtual = $this->xpath($doc, '/result/whitelist/virtual/text()') == 'true';
 
         $wl->vatStatus = intval($this->xpath($doc, '/result/whitelist/vatStatus/text()'));
         $wl->vatResult = $this->xpath($doc, '/result/whitelist/vatResult/text()');
@@ -787,30 +736,23 @@ class NIP24Client
 
     /**
      * Search data in VAT registry
-     *
-     * @param string $nip
-     *            NIP number
-     * @param string $date
-     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @param string $nip NIP number
+     * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return SearchResult|false
      */
-    public function searchVATRegistry($nip, $date = null)
+    public function searchVATRegistry(string $nip, string $date = null)
     {
         return $this->searchVATRegistryExt(Number::NIP, $nip, $date);
     }
 
     /**
      * Search data in VAT registry
-     *
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @param string $date
-     *            date in format 'yyyy-mm-dd' (null - current day)
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return SearchResult|false
      */
-    public function searchVATRegistryExt($type, $number, $date = null)
+    public function searchVATRegistryExt(int $type, string $number, string $date = null)
     {
         // clear error
         $this->clear();
@@ -882,10 +824,10 @@ class NIP24Client
                     break;
                 }
 
-                array_push($ve->ibans, $iban);
+                $ve->ibans[] = $iban;
             }
 
-            $ve->hasVirtualAccounts = ($this->xpath($doc, '/result/search/entities/entity[' . $i . ']/hasVirtualAccounts/text()') == 'true' ? true : false);
+            $ve->hasVirtualAccounts = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/hasVirtualAccounts/text()') == 'true';
             $ve->registrationLegalDate = $this->xpathDate($doc, '/result/search/entities/entity[' . $i . ']/registrationLegalDate/text()');
             $ve->registrationDenialDate = $this->xpathDate($doc, '/result/search/entities/entity[' . $i . ']/registrationDenialDate/text()');
             $ve->registrationDenialBasis = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/registrationDenialBasis/text()');
@@ -894,7 +836,7 @@ class NIP24Client
             $ve->removalDate = $this->xpathDate($doc, '/result/search/entities/entity[' . $i . ']/removalDate/text()');
             $ve->removalBasis = $this->xpath($doc, '/result/search/entities/entity[' . $i . ']/removalBasis/text()');
 
-            array_push($sr->results, $ve);
+            $sr->results[] = $ve;
         }
 
         $sr->id = $this->xpath($doc, '/result/search/id/text()');
@@ -906,30 +848,23 @@ class NIP24Client
 
     /**
      * Get all data from KRS registry
-     *
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @return \NIP24\Model\KRSData|false
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @return KRSData|false
      */
-    public function getKRSData($type, $number)
+    public function getKRSData(int $type, string $number)
     {
         return $this->getKRSSection($type, $number, 0);
     }
 
     /**
      * Get data of one specific section from KRS registry
-     *
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
-     * @param int $section
-     *            number of section to get [1-6]
-     * @return \NIP24\Model\KRSData|false
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
+     * @param int $section number of section to get [1-6]
+     * @return KRSData|false
      */
-    public function getKRSSection($type, $number, $section)
+    public function getKRSSection(int $type, string $number, int $section)
     {
         // clear error
         $this->clear();
@@ -962,7 +897,7 @@ class NIP24Client
             return false;
         }
 
-        if (isset($doc->error) && isset($doc->error->code)) {
+        if (isset($doc->error->code)) {
             $this->set(intval($doc->error->code), $doc->error->description);
             return false;
         }
@@ -970,7 +905,7 @@ class NIP24Client
         // parse response
         $kd = ObjectSerializer::deserialize($doc->krs, '\NIP24\Model\KRSData');
 
-        if ($kd == null) {
+        if (! $kd instanceof KRSData) {
             $this->set(Error::CLI_RESPONSE);
             return false;
         }
@@ -980,7 +915,6 @@ class NIP24Client
 
     /**
      * Get current account status
-     * 
      * @return AccountStatus|false
      */
     public function getAccountStatus()
@@ -1036,28 +970,28 @@ class NIP24Client
 		$as->request_delay = intval($this->xpath($doc, '/result/account/billingPlan/requestDelay/text()'));
 		$as->domain_limit = intval($this->xpath($doc, '/result/account/billingPlan/domainLimit/text()'));
 		
-		$as->overplan_allowed = ($this->xpath($doc, '/result/account/billingPlan/overplanAllowed/text()') == 'true' ? true : false);
-		$as->teryt_codes = ($this->xpath($doc, '/result/account/billingPlan/terytCodes/text()') == 'true' ? true : false);
-		$as->excel_addin = ($this->xpath($doc, '/result/account/billingPlan/excelAddin/text()') == 'true' ? true : false);
-		$as->jpk_vat = ($this->xpath($doc, '/result/account/billingPlan/jpkVat/text()') == 'true' ? true : false);
-        $as->cli = ($this->xpath($doc, '/result/account/billingPlan/cli/text()') == 'true' ? true : false);
-		$as->stats = ($this->xpath($doc, '/result/account/billingPlan/stats/text()') == 'true' ? true : false);
-		$as->nip_monitor = ($this->xpath($doc, '/result/account/billingPlan/nipMonitor/text()') == 'true' ? true : false);
+		$as->overplan_allowed = $this->xpath($doc, '/result/account/billingPlan/overplanAllowed/text()') == 'true';
+		$as->teryt_codes = $this->xpath($doc, '/result/account/billingPlan/terytCodes/text()') == 'true';
+		$as->excel_addin = $this->xpath($doc, '/result/account/billingPlan/excelAddin/text()') == 'true';
+		$as->jpk_vat = $this->xpath($doc, '/result/account/billingPlan/jpkVat/text()') == 'true';
+        $as->cli = $this->xpath($doc, '/result/account/billingPlan/cli/text()') == 'true';
+		$as->stats = $this->xpath($doc, '/result/account/billingPlan/stats/text()') == 'true';
+		$as->nip_monitor = $this->xpath($doc, '/result/account/billingPlan/nipMonitor/text()') == 'true';
 		
-		$as->search_by_nip = ($this->xpath($doc, '/result/account/billingPlan/searchByNip/text()') == 'true' ? true : false);
-		$as->search_by_regon = ($this->xpath($doc, '/result/account/billingPlan/searchByRegon/text()') == 'true' ? true : false);
-		$as->search_by_krs = ($this->xpath($doc, '/result/account/billingPlan/searchByKrs/text()') == 'true' ? true : false);
+		$as->search_by_nip = $this->xpath($doc, '/result/account/billingPlan/searchByNip/text()') == 'true';
+		$as->search_by_regon = $this->xpath($doc, '/result/account/billingPlan/searchByRegon/text()') == 'true';
+		$as->search_by_krs = $this->xpath($doc, '/result/account/billingPlan/searchByKrs/text()') == 'true';
 		
-		$as->func_is_active = ($this->xpath($doc, '/result/account/billingPlan/funcIsActive/text()') == 'true' ? true : false);
-		$as->func_get_invoice_data = ($this->xpath($doc, '/result/account/billingPlan/funcGetInvoiceData/text()') == 'true' ? true : false);
-		$as->func_get_all_data = ($this->xpath($doc, '/result/account/billingPlan/funcGetAllData/text()') == 'true' ? true : false);
-		$as->func_get_vies_data =($this->xpath($doc, '/result/account/billingPlan/funcGetVIESData/text()') == 'true' ? true : false);
-		$as->func_get_vat_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetVATStatus/text()') == 'true' ? true : false);
-		$as->func_get_iban_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetIBANStatus/text()') == 'true' ? true : false);
-        $as->func_get_whitelist_status = ($this->xpath($doc, '/result/account/billingPlan/funcGetWLStatus/text()') == 'true' ? true : false);
-        $as->func_search_vat = ($this->xpath($doc, '/result/account/billingPlan/funcSearchVAT/text()') == 'true' ? true : false);
-        $as->func_get_krs_data = ($this->xpath($doc, '/result/account/billingPlan/funcGetKRSData/text()') == 'true' ? true : false);
-        $as->func_get_krs_section = ($this->xpath($doc, '/result/account/billingPlan/funcGetKRSSection/text()') == 'true' ? true : false);
+		$as->func_is_active = $this->xpath($doc, '/result/account/billingPlan/funcIsActive/text()') == 'true';
+		$as->func_get_invoice_data = $this->xpath($doc, '/result/account/billingPlan/funcGetInvoiceData/text()') == 'true';
+		$as->func_get_all_data = $this->xpath($doc, '/result/account/billingPlan/funcGetAllData/text()') == 'true';
+		$as->func_get_vies_data = $this->xpath($doc, '/result/account/billingPlan/funcGetVIESData/text()') == 'true';
+		$as->func_get_vat_status = $this->xpath($doc, '/result/account/billingPlan/funcGetVATStatus/text()') == 'true';
+		$as->func_get_iban_status = $this->xpath($doc, '/result/account/billingPlan/funcGetIBANStatus/text()') == 'true';
+        $as->func_get_whitelist_status = $this->xpath($doc, '/result/account/billingPlan/funcGetWLStatus/text()') == 'true';
+        $as->func_search_vat = $this->xpath($doc, '/result/account/billingPlan/funcSearchVAT/text()') == 'true';
+        $as->func_get_krs_data = $this->xpath($doc, '/result/account/billingPlan/funcGetKRSData/text()') == 'true';
+        $as->func_get_krs_section = $this->xpath($doc, '/result/account/billingPlan/funcGetKRSSection/text()') == 'true';
 		
 		$as->invoice_data_count = intval($this->xpath($doc, '/result/account/requests/invoiceData/text()'));
 		$as->all_data_count = intval($this->xpath($doc, '/result/account/requests/allData/text()'));
@@ -1076,20 +1010,18 @@ class NIP24Client
 
 	/**
      * Get last error code
-     * 
      * @return int error code
      */
-    public function getLastErrorCode()
+    public function getLastErrorCode(): int
     {
         return $this->errcode;
     }
 
     /**
      * Get last error message
-     *
      * @return string error message
      */
-    public function getLastError()
+    public function getLastError(): string
     {
         return $this->err;
     }
@@ -1105,11 +1037,10 @@ class NIP24Client
 
     /**
      * Set error details
-     *
      * @param int $code error code
-     * @param string $err error message
+     * @param string|null $err error message
      */
-    private function set($code, $err = null)
+    private function set(int $code, string $err = null)
     {
         $this->errcode = $code;
         $this->err = (empty($err) ? Error::message($code) : $err);
@@ -1117,14 +1048,11 @@ class NIP24Client
 
     /**
      * Prepare authorization header content
-     * 
-     * @param string $method
-     *            HTTP method
-     * @param string $url
-     *            target URL
+     * @param string $method HTTP method
+     * @param string $url target URL
      * @return string|false
      */
-    private function auth($method, $url)
+    private function auth(string $method, string $url)
     {
         // parse url
         $u = parse_url($url);
@@ -1156,10 +1084,9 @@ class NIP24Client
 
     /**
      * Prepare user agent information header content
-     * 
      * @return string
      */
-    private function userAgent()
+    private function userAgent(): string
     {
         return 'User-Agent: ' . (! empty($this->app) ? $this->app . ' ' : '') . 'NIP24Client/' . self::VERSION
             . ' PHP/' . phpversion();
@@ -1167,7 +1094,6 @@ class NIP24Client
 
     /**
      * Set some common CURL options
-     * 
      * @param resource $curl
      */
     private function setCurlOpt($curl)
@@ -1185,14 +1111,11 @@ class NIP24Client
 
     /**
      * Get result of HTTP GET request
-     * 
-     * @param string $url
-     *            target URL
-     * @param string $mimetype
-     *            requested response MIME type (application/xml or application/json)
+     * @param string $url target URL
+     * @param string $mimetype requested response MIME type (application/xml or application/json)
      * @return string|false
      */
-    private function get($url, $mimetype = 'application/xml')
+    private function get(string $url, string $mimetype = 'application/xml')
     {
         // auth
         $auth = $this->auth('GET', $url);
@@ -1233,14 +1156,11 @@ class NIP24Client
 
     /**
      * Get element content as text
-     * 
-     * @param \SimpleXMLElement $doc
-     *            XML document
-     * @param string $path
-     *            xpath string
+     * @param SimpleXMLElement $doc XML document
+     * @param string $path xpath string
      * @return string
      */
-    private function xpath($doc, $path)
+    private function xpath(SimpleXMLElement $doc, string $path): string
     {
         $a = $doc->xpath($path);
         
@@ -1257,14 +1177,11 @@ class NIP24Client
 
     /**
      * Get element content as date in format yyyy-mm-dd
-     * 
-     * @param \SimpleXMLElement $doc
-     *            XML document
-     * @param string $path
-     *            xpath string
+     * @param SimpleXMLElement $doc XML document
+     * @param string $path xpath string
      * @return string output date
      */
-    private function xpathDate($doc, $path)
+    private function xpathDate(SimpleXMLElement $doc, string $path): string
     {
         $val = $this->xpath($doc, $path);
         
@@ -1277,14 +1194,11 @@ class NIP24Client
 
     /**
      * Get element content as date and time in format yyyy-mm-dd hh:mm:ss
-     *
-     * @param \SimpleXMLElement $doc
-     *            XML document
-     * @param string $path
-     *            xpath string
+     * @param SimpleXMLElement $doc XML document
+     * @param string $path xpath string
      * @return string output date time
      */
-    private function xpathDateTime($doc, $path)
+    private function xpathDateTime(SimpleXMLElement $doc, string $path): string
     {
         $val = $this->xpath($doc, $path);
 
@@ -1297,12 +1211,11 @@ class NIP24Client
 
     /**
      * Get element content as VAT person object
-     *
-     * @param \SimpleXMLElement $doc XML document
+     * @param SimpleXMLElement $doc XML document
      * @param string $path xpath string
      * @param array $a VAT persons array reference
      */
-    private function xpathVATPerson($doc, $path, &$a)
+    private function xpathVATPerson(SimpleXMLElement $doc, string $path, array &$a)
     {
         for ($i = 1; ; $i++) {
             $nip = $this->xpath($doc, $path . '/person[' . $i . ']/nip/text()');
@@ -1318,20 +1231,17 @@ class NIP24Client
             $vp->firstName = $this->xpath($doc, $path . '/person[' . $i . ']/firstName/text()');
             $vp->lastName = $this->xpath($doc, $path . '/person[' . $i . ']/lastName/text()');
 
-            array_push($a, $vp);
+            $a[] = $vp;
         }
     }
 
     /**
      * Get path suffix
-     *
-     * @param int $type
-     *            search number type as Number::xxx value
-     * @param string $number
-     *            search number value
+     * @param int $type search number type as Number::xxx value
+     * @param string $number search number value
      * @return string|false
      */
-    private function getPathSuffix($type, $number)
+    private function getPathSuffix(int $type, string $number)
     {
         if ($type == Number::NIP) {
             if (! NIP::isValid($number)) {
