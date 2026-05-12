@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2025 NETCAT (www.netcat.pl)
+ * Copyright 2015-2026 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2025 NETCAT (www.netcat.pl)
+ * @copyright 2015-2026 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -31,7 +31,7 @@ class EUVAT
      * @param string|null $number input string
      * @return string|false
      */
-    public static function normalize(?string $number)
+    public static function normalize(?string $number): string|false
     {
         if (is_null($number) || strlen($number) <= 2) {
             return false;

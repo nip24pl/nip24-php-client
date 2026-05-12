@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2025 NETCAT (www.netcat.pl)
+ * Copyright 2015-2026 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2025 NETCAT (www.netcat.pl)
+ * @copyright 2015-2026 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,73 +26,73 @@ namespace NIP24;
  */
 class AllData extends InvoiceData
 {
-    public string $type;
+    public ?string $type;
 
-    public string $regon;
+    public ?string $regon;
 
-    public string $shortname;
+    public ?string $shortname;
 
-    public string $secondname;
+    public ?string $secondname;
 
-    public string $streetCode;
+    public ?string $streetCode;
     
-    public string $cityCode;
+    public ?string $cityCode;
     
-    public string $community;
+    public ?string $community;
     
-    public string $communityCode;
+    public ?string $communityCode;
 
-    public string $county;
+    public ?string $county;
     
-    public string $countyCode;
+    public ?string $countyCode;
 
-    public string $state;
+    public ?string $state;
     
-    public string $stateCode;
+    public ?string $stateCode;
 
-    public string $creationDate;
+    public ?string $creationDate;
 
-    public string $startDate;
+    public ?string $startDate;
 
-    public string $registrationDate;
+    public ?string $registrationDate;
 
-    public string $holdDate;
+    public ?string $holdDate;
 
-    public string $renevalDate;
+    public ?string $renevalDate;
 
-    public string $lastUpdateDate;
+    public ?string $lastUpdateDate;
 
-    public string $bankruptcyDate;
+    public ?string $bankruptcyDate;
 
-    public string $endOfBankruptcyProceedingsDate;
+    public ?string $endOfBankruptcyProceedingsDate;
 
-    public string $endDate;
+    public ?string $endDate;
 
-    public string $deletionDate;
+    public ?string $deletionDate;
 
-    public string $registryEntityCode;
+    public ?string $registryEntityCode;
 
-    public string $registryEntityName;
+    public ?string $registryEntityName;
 
-    public string $registryCode;
+    public ?string $registryCode;
 
-    public string $registryName;
+    public ?string $registryName;
 
-    public string $recordCreationDate;
+    public ?string $recordCreationDate;
 
-    public string $recordNumber;
+    public ?string $recordNumber;
 
-    public string $basicLegalFormCode;
+    public ?string $basicLegalFormCode;
 
-    public string $basicLegalFormName;
+    public ?string $basicLegalFormName;
 
-    public string $specificLegalFormCode;
+    public ?string $specificLegalFormCode;
 
-    public string $specificLegalFormName;
+    public ?string $specificLegalFormName;
 
-    public string $ownershipFormCode;
+    public ?string $ownershipFormCode;
 
-    public string $ownershipFormName;
+    public ?string $ownershipFormName;
 
     public array $businessPartner;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2025 NETCAT (www.netcat.pl)
+ * Copyright 2015-2026 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2025 NETCAT (www.netcat.pl)
+ * @copyright 2015-2026 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -30,21 +30,21 @@ class VATEntity
     const ACTIVE = 2;
     const EXEMPTED = 3;
 
-    public string $name;
+    public ?string $name;
 
-    public string $nip;
+    public ?string $nip;
     
-    public string $regon;
+    public ?string $regon;
 
-    public string $krs;
+    public ?string $krs;
 
-    public string $residenceAddress;
+    public ?string $residenceAddress;
 
-    public string $workingAddress;
+    public ?string $workingAddress;
 
     public int $vatStatus;
 
-    public string $vatResult;
+    public ?string $vatResult;
 
     public array $representatives;
 
@@ -56,19 +56,19 @@ class VATEntity
 
     public bool $hasVirtualAccounts;
 
-    public string $registrationLegalDate;
+    public ?string $registrationLegalDate;
 
-    public string $registrationDenialDate;
+    public ?string $registrationDenialDate;
 
-    public string $registrationDenialBasis;
+    public ?string $registrationDenialBasis;
 
-    public string $restorationDate;
+    public ?string $restorationDate;
 
-    public string $restorationBasis;
+    public ?string $restorationBasis;
 
-    public string $removalDate;
+    public ?string $removalDate;
 
-    public string $removalBasis;
+    public ?string $removalBasis;
 
     public function __construct()
     {

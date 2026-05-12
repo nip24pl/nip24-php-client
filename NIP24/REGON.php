@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2025 NETCAT (www.netcat.pl)
+ * Copyright 2015-2026 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2025 NETCAT (www.netcat.pl)
+ * @copyright 2015-2026 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -31,7 +31,7 @@ class REGON
      * @param string|null $regon input string
      * @return string|false
      */
-    public static function normalize(?string $regon)
+    public static function normalize(?string $regon): string|false
     {
         if (is_null($regon) || strlen($regon) == 0) {
             return false;

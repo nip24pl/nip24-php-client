@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2025 NETCAT (www.netcat.pl)
+ * Copyright 2015-2026 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2025 NETCAT (www.netcat.pl)
+ * @copyright 2015-2026 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,13 +26,13 @@ namespace NIP24;
  */
 class AccountStatus
 {
-    public string $uid;
+    public ?string $uid;
 
-    public string $type;
+    public ?string $type;
 
-    public string $valid_to;
+    public ?string $valid_to;
 
-    public string $billing_plan_name;
+    public ?string $billing_plan_name;
 
     public float $subscription_price;
 

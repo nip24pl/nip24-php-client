@@ -12,7 +12,7 @@
 			error_reporting(E_ALL);
 			
 			// nip24 api
-			require_once 'NIP24/NIP24Client.php';
+			require_once '../NIP24/NIP24Client.php';
 			
 			\NIP24\NIP24Client::registerAutoloader();
 			

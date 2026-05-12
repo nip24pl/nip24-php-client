@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2025 NETCAT (www.netcat.pl)
+ * Copyright 2015-2026 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  * limitations under the License.
  * 
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2025 NETCAT (www.netcat.pl)
+ * @copyright 2015-2026 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
 namespace NIP24;
 
+use CurlHandle;
 use NIP24\Model\KRSData;
 use SimpleXMLElement;
 
@@ -29,7 +30,7 @@ use SimpleXMLElement;
  */
 class NIP24Client
 {
-    const VERSION = '1.4.5';
+    const VERSION = '1.4.6';
 
     const PRODUCTION_URL = 'https://www.nip24.pl/api';
     const TEST_URL = 'https://www.nip24.pl/api-test';
@@ -40,15 +41,15 @@ class NIP24Client
     private string $url;
     private string $id;
     private string $key;
-    private string $app;
+    private ?string $app;
 
     private int $errcode;
-    private string $err;
+    private ?string $err;
 
     /**
      * NIP24 PSR-0 autoloader
      */
-    public static function autoload(string $className)
+    public static function autoload(string $className): void
     {
         $className = str_replace('NIP24\\', '', $className);
         $path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
@@ -61,7 +62,7 @@ class NIP24Client
     /**
      * Register NIP24's PSR-0 autoloader
      */
-    public static function registerAutoloader()
+    public static function registerAutoloader(): void
     {
         $files = array(
             'Error.php',
@@ -101,7 +102,7 @@ class NIP24Client
      * @param string|null $id NIP24 key identifier
      * @param string|null $key NIP24 key
      */
-    public function __construct(string $id = null, string $key = null)
+    public function __construct(?string $id = null, ?string $key = null)
     {
         $this->url = self::TEST_URL;
         $this->id = self::TEST_ID;
@@ -121,16 +122,16 @@ class NIP24Client
      * Set non default service URL
      * @param string $url service URL
      */
-    public function setURL(string $url)
+    public function setURL(string $url): void
     {
         $this->url = $url;
     }
 
     /**
      * Set application info
-     * @param string $app app info
+     * @param string|null $app app info
      */
-    public function setApp(string $app)
+    public function setApp(?string $app): void
     {
         $this->app = $app;
     }
@@ -202,7 +203,7 @@ class NIP24Client
      * @param bool $force ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceData(string $nip, bool $force = true)
+    public function getInvoiceData(string $nip, bool $force = true): InvoiceData|false
     {
         return $this->getInvoiceDataExt(Number::NIP, $nip, $force);
     }
@@ -214,7 +215,7 @@ class NIP24Client
      * @param bool $force ignored, left for backward compatibility
      * @return InvoiceData|false
      */
-    public function getInvoiceDataExt(int $type, string $number, bool $force = true)
+    public function getInvoiceDataExt(int $type, string $number, bool $force = true): InvoiceData|false
     {
         // clear error
         $this->clear();
@@ -278,7 +279,7 @@ class NIP24Client
      * @param bool $force ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllData(string $nip, bool $force = true)
+    public function getAllData(string $nip, bool $force = true): AllData|false
     {
         return $this->getAllDataExt(Number::NIP, $nip, $force);
     }
@@ -290,7 +291,7 @@ class NIP24Client
      * @param bool $force ignored, left for backward compatibility
      * @return AllData|false
      */
-    public function getAllDataExt(int $type, string $number, bool $force = true)
+    public function getAllDataExt(int $type, string $number, bool $force = true): AllData|false
     {
         // clear error
         $this->clear();
@@ -436,7 +437,7 @@ class NIP24Client
      * @param string $euvat EU VAT number with 2-letter country prefix
      * @return VIESData|false
      */
-    public function getVIESData(string $euvat)
+    public function getVIESData(string $euvat): VIESData|false
     {
         // clear error
         $this->clear();
@@ -495,7 +496,7 @@ class NIP24Client
      * @param string $nip NIP number
      * @return VATStatus|false
      */
-    public function getVATStatus(string $nip)
+    public function getVATStatus(string $nip): VATStatus|false
     {
         return $this->getVATStatusExt(Number::NIP, $nip, true);
     }
@@ -507,7 +508,7 @@ class NIP24Client
      * @param bool $direct ignored, left for backward compatibility
      * @return VATStatus|false
      */
-    public function getVATStatusExt(int $type, string $number, bool $direct = true)
+    public function getVATStatusExt(int $type, string $number, bool $direct = true): VATStatus|false
     {
         // clear error
         $this->clear();
@@ -566,7 +567,7 @@ class NIP24Client
      * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
-    public function getIBANStatus(string $nip, string $iban, string $date = null)
+    public function getIBANStatus(string $nip, string $iban, ?string $date = null): IBANStatus|false
     {
         return $this->getIBANStatusExt(Number::NIP, $nip, $iban, $date);
     }
@@ -579,7 +580,7 @@ class NIP24Client
      * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return IBANStatus|false
      */
-    public function getIBANStatusExt(int $type, string $number, string $iban, string $date = null)
+    public function getIBANStatusExt(int $type, string $number, string $iban, ?string $date = null): IBANStatus|false
     {
         // clear error
         $this->clear();
@@ -651,7 +652,7 @@ class NIP24Client
      * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return WLStatus|false
      */
-    public function getWhitelistStatus(string $nip, string $iban, string $date = null)
+    public function getWhitelistStatus(string $nip, string $iban, ?string $date = null): WLStatus|false
     {
         return $this->getWhitelistStatusExt(Number::NIP, $nip, $iban, $date);
     }
@@ -664,7 +665,7 @@ class NIP24Client
      * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return WLStatus|false
      */
-    public function getWhitelistStatusExt(int $type, string $number, string $iban, string $date = null)
+    public function getWhitelistStatusExt(int $type, string $number, string $iban, ?string $date = null): WLStatus|false
     {
         // clear error
         $this->clear();
@@ -740,7 +741,7 @@ class NIP24Client
      * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return SearchResult|false
      */
-    public function searchVATRegistry(string $nip, string $date = null)
+    public function searchVATRegistry(string $nip, ?string $date = null): SearchResult|false
     {
         return $this->searchVATRegistryExt(Number::NIP, $nip, $date);
     }
@@ -752,7 +753,7 @@ class NIP24Client
      * @param string|null $date date in format 'yyyy-mm-dd' (null - current day)
      * @return SearchResult|false
      */
-    public function searchVATRegistryExt(int $type, string $number, string $date = null)
+    public function searchVATRegistryExt(int $type, string $number, ?string $date = null): SearchResult|false
     {
         // clear error
         $this->clear();
@@ -852,7 +853,7 @@ class NIP24Client
      * @param string $number search number value
      * @return KRSData|false
      */
-    public function getKRSData(int $type, string $number)
+    public function getKRSData(int $type, string $number): KRSData|false
     {
         return $this->getKRSSection($type, $number, 0);
     }
@@ -864,7 +865,7 @@ class NIP24Client
      * @param int $section number of section to get [1-6]
      * @return KRSData|false
      */
-    public function getKRSSection(int $type, string $number, int $section)
+    public function getKRSSection(int $type, string $number, int $section): KRSData|false
     {
         // clear error
         $this->clear();
@@ -917,7 +918,7 @@ class NIP24Client
      * Get current account status
      * @return AccountStatus|false
      */
-    public function getAccountStatus()
+    public function getAccountStatus(): AccountStatus|false
     {
         // clear error
         $this->clear();
@@ -1019,9 +1020,9 @@ class NIP24Client
 
     /**
      * Get last error message
-     * @return string error message
+     * @return string|null error message
      */
-    public function getLastError(): string
+    public function getLastError(): ?string
     {
         return $this->err;
     }
@@ -1029,10 +1030,10 @@ class NIP24Client
     /**
      * Clear error
      */
-    private function clear()
+    private function clear(): void
     {
         $this->errcode = 0;
-        $this->err = '';
+        $this->err = null;
     }
 
     /**
@@ -1040,7 +1041,7 @@ class NIP24Client
      * @param int $code error code
      * @param string|null $err error message
      */
-    private function set(int $code, string $err = null)
+    private function set(int $code, ?string $err = null): void
     {
         $this->errcode = $code;
         $this->err = (empty($err) ? Error::message($code) : $err);
@@ -1052,7 +1053,7 @@ class NIP24Client
      * @param string $url target URL
      * @return string|false
      */
-    private function auth(string $method, string $url)
+    private function auth(string $method, string $url): string|false
     {
         // parse url
         $u = parse_url($url);
@@ -1094,9 +1095,9 @@ class NIP24Client
 
     /**
      * Set some common CURL options
-     * @param resource $curl
+     * @param CurlHandle $curl
      */
-    private function setCurlOpt($curl)
+    private function setCurlOpt(CurlHandle $curl): void
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
             // curl on a windows does not know where to look for certificates
@@ -1115,7 +1116,7 @@ class NIP24Client
      * @param string $mimetype requested response MIME type (application/xml or application/json)
      * @return string|false
      */
-    private function get(string $url, string $mimetype = 'application/xml')
+    private function get(string $url, string $mimetype = 'application/xml'): string|false
     {
         // auth
         $auth = $this->auth('GET', $url);
@@ -1215,7 +1216,7 @@ class NIP24Client
      * @param string $path xpath string
      * @param array $a VAT persons array reference
      */
-    private function xpathVATPerson(SimpleXMLElement $doc, string $path, array &$a)
+    private function xpathVATPerson(SimpleXMLElement $doc, string $path, array &$a): void
     {
         for ($i = 1; ; $i++) {
             $nip = $this->xpath($doc, $path . '/person[' . $i . ']/nip/text()');
@@ -1241,7 +1242,7 @@ class NIP24Client
      * @param string $number search number value
      * @return string|false
      */
-    private function getPathSuffix(int $type, string $number)
+    private function getPathSuffix(int $type, string $number): string|false
     {
         if ($type == Number::NIP) {
             if (! NIP::isValid($number)) {

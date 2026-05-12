@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015-2025 NETCAT (www.netcat.pl)
+ * Copyright 2015-2026 NETCAT (www.netcat.pl)
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  * @author NETCAT <firma@netcat.pl>
- * @copyright 2015-2025 NETCAT (www.netcat.pl)
+ * @copyright 2015-2026 NETCAT (www.netcat.pl)
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -26,33 +26,33 @@ namespace NIP24;
  */
 class InvoiceData
 {
-    public string $uid;
+    public ?string $uid;
     
-    public string $nip;
+    public ?string $nip;
 
-    public string $name;
+    public ?string $name;
 
-    public string $firstname;
+    public ?string $firstname;
 
-    public string $lastname;
+    public ?string $lastname;
 
-    public string $street;
+    public ?string $street;
 
-    public string $streetNumber;
+    public ?string $streetNumber;
 
-    public string $houseNumber;
+    public ?string $houseNumber;
 
-    public string $city;
+    public ?string $city;
 
-    public string $postCode;
+    public ?string $postCode;
 
-    public string $postCity;
+    public ?string $postCity;
 
-    public string $phone;
+    public ?string $phone;
 
-    public string $email;
+    public ?string $email;
 
-    public string $www;
+    public ?string $www;
     
     /**
      * Get object data as string
